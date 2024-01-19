@@ -23,14 +23,14 @@
 
 Убедитесь, что у вас установлены Docker и docker-compose.
 
-1. Копирование репозитория:
+### 1. Копирование репозитория:
 
     ```bash
     git clone https://github.com/MikhalchenkoD/ylab-homework.git
     cd ylab-homework
     ```
 
-2. Создание и активация виртуального окружения:
+### 2. Создание и активация виртуального окружения:
 
     ```bash
       python -m venv venv
@@ -43,11 +43,11 @@
    ```bash
       source venv/bin/activate
     ```
-3. Установка зависимостей:
+### 3. Установка зависимостей:
    ```bash
     pip install -r requirements.txt
     ```
-4. Подготовка БД:
+### 4. Подготовка БД:
    
     Замените URL подлючения к БД на свой. URL находится в database/database в переменой engine_url:
     ```
@@ -63,7 +63,7 @@
    ```bash
    alembic upgrade head
    ```
-5. Запуск приложения:
+### 5. Запуск приложения:
     ```bash
     python main.py
     ```
