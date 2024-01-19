@@ -311,7 +311,7 @@ Response
 }
 ```
 
-### 9. PATCH Обновить блюдо
+### 14. PATCH Обновить блюдо
 ```
 127.0.0.1:8000/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}
 ```
@@ -335,7 +335,7 @@ Response
 }
 ```
 
-### 10. DELETE Удалить блюдо
+### 15. DELETE Удалить блюдо
 ```
 127.0.0.1:8000/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}
 ```
