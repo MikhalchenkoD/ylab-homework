@@ -23,186 +23,329 @@
 
 Убедитесь, что у вас установлены Docker и docker-compose.
 
-1. Клонируйте репозиторий:
+1. Копирование репозитория:
 
     ```bash
     git clone https://github.com/MikhalchenkoD/ylab-homework.git
     cd ylab-homework
     ```
 
-2. Активируйте виртуальное окружение:
+2. Создание и активация виртуального окружения:
 
     ```bash
-  python -m venv venv
-  Активация виртуального окружения для Windows
-  venv\Scripts\activate
-  Активация виртуального окружения для macOS и Linux
-  source venv/bin/activate
+      python -m venv venv
+    ```
+      Активация виртуального окружения для Windows
+   ```bash
+      venv\Scripts\activate
+    ```
+      Активация виртуального окружения для macOS и Linux
+   ```bash
+      source venv/bin/activate
+    ```
+3. Установка зависимостей:
+   ```bash
+    pip install -r requirements.txt
+    ```
+4. Подготовка БД:
+   
+    Замените URL подлючения к БД на свой. URL находится в database/database в переменой engine_url:
+    ```
+    "postgresql+asyncpg://postgres:1234@localhost/ylab1"
+    ```
+    
+    Также замените URL подключения к БД в файле alembic.ini:
+    ```
+    postgresql://postgres:1234@localhost/ylab1
     ```
 
-## Использование
-### 1. Добавление твита
+    Выполните миграции
+   ```bash
+   alembic upgrade head
+   ```
+5. Запуск приложения:
+    ```bash
+    python main.py
+    ```
+
+## Edpoints
+### 1. GET Просмотр списка меню
 ```
-POST /api/tweets
-HTTP-Params:
-api-key: str
+127.0.0.1:8000/api/v1/menus
+```
+
+Response
+```
+[
+    {
+        "id": "a2eb416c-2245-4526-bb4b-6343d5c5016f",
+        "title": "My menu 1",
+        "description": "My menu description 1",
+        "submenus_count": 0,
+        "dishes_count": 0
+    }
+]
+```
+
+### 2. GET Просмотр определенного меню
+```
+127.0.0.1:8000/api/v1/menus/{menu_id}
+```
+
+Response
+```
 {
-“tweet_data”: string
-“tweet_media_ids”: Array[int] // Опциональный параметр. Загрузка
-картинок будет происходить по endpoint /api/media. Фронтенд будет
-подгружать картинки туда автоматически при отправке твита и подставлять
-id оттуда в json.
+    "id": "a2eb416c-2245-4526-bb4b-6343d5c5016f",
+    "title": "My menu 1",
+    "description": "My menu description 1",
+    "submenus_count": 0,
+    "dishes_count": 0
 }
 ```
 
-#### Запросом на этот endpoint пользователь будет создавать новый твит. Бэкенд будет его валидировать и сохранять в базу. В ответ должен вернуться id созданного твита.
+### 3. POST Создать меню
+```
+127.0.0.1:8000/api/v1/menus
+```
+
+Body
 ```
 {
-“result”: true,
-“tweet_id”: int
+    "title": "My menu 1",
+    "description": "My menu description 1"
 }
 ```
 
-### 2. Endpoint для загрузки файлов из твита. Загрузка происходит через
-отправку формы.
-```
-POST /api/medias
-HTTP-Params:
-api-key: str
-form: file=”image.jpg”
-```
-#### В ответ должен вернуться id загруженного файла.
+Response
 ```
 {
-“result”: true,
-“media_id”: int
+    "id": "9a5bce5f-4462-4d12-a66c-d59584b19ee8",
+    "title": "My menu 1",
+    "description": "My menu description 1",
+    "submenus_count": 0,
+    "dishes_count": 0
 }
 ```
 
-### 3. Ещё нам потребуется endpoint по удалению твита.
+### 4. PATCH Обновить меню
 ```
-DELETE /api/tweets/<id>
-HTTP-Params:
-api-key: str
+127.0.0.1:8000/api/v1/menus/{menu_id}
 ```
-#### В ответ должно вернуться сообщение о статусе операции.
+
+Body
 ```
 {
-“result”: true
+    "title": "My updated menu 1",
+    "description": "My updated menu description 1"
 }
 ```
 
-### 4. Пользователь может поставить отметку «Нравится» на твит.
-```
-POST /api/tweets/<id>/likes
-HTTP-Params:
-api-key: str
-```
-#### В ответ должно вернуться сообщение о статусе операции.
+Response
 ```
 {
-“result”: true
+    "id": "a2eb416c-2245-4526-bb4b-6343d5c5016f",
+    "title": "My updated menu 1",
+    "description": "My updated menu description 1",
+    "submenus_count": 0,
+    "dishes_count": 0
 }
 ```
 
-### 5. Пользователь может убрать отметку «Нравится» с твита.
+### 5. DELETE Удалить меню
 ```
-DELETE /api/tweets/<id>/likes
-HTTP-Params:
-api-key: str
+127.0.0.1:8000/api/v1/menus/{menu_id}
 ```
-#### В ответ должно вернуться сообщение о статусе операции.
+
+Response
 ```
 {
-“result”: true
+    "status": true,
+    "message": "The menu has been deleted"
 }
 ```
 
-### 6. Пользователь может зафоловить другого пользователя.
+### 6. GET Просмотр списка меню
 ```
-POST /api/users/<id>/follow
-HTTP-Params:
-api-key: str
+127.0.0.1:8000/api/v1/menus/{menu_id}/submenus
 ```
-#### В ответ должно вернуться сообщение о статусе операции.
+
+Response
 ```
-{
-“result”: true
-}
+[
+    {
+        "id": "bc19488a-cc0e-4eaa-8d21-4d486a45392f",
+        "title": "My submenu 1",
+        "description": "My submenu description 1",
+        "dishes_count": 0
+    }
+]
 ```
-### 7. Пользователь может убрать подписку на другого пользователя.
+
+### 7. GET Просмотр определенного подменю
 ```
-DELETE /api/users/<id>/follow
-HTTP-Params:
-api-key: str
+127.0.0.1:8000/api/v1/menus/{menu_id}/submenus/{submenu_id}
 ```
-#### В ответ должно вернуться сообщение о статусе операции.
-```
-{
-“result”: true
-}
-```
-### 8. Пользователь может получить ленту с твитами.
-```
-GET /api/tweets
-HTTP-Params:
-api-key: str
-```
-#### В ответ должен вернуться json со списком твитов для ленты этого пользователя.
+
+Response
 ```
 {
-“result”: true,
-"tweets": [
-{
-"id": int,
-"content": string,
-"attachments" [link_1, link_2,]
-"author": {"id": int", "name": string}
-“likes”: [{“user_id”: int, “name”: string}]
-}]}
-```
-#### В случае любой ошибки на стороне бэкенда возвращайте сообщение следующего формата:
-```
-{
-“result”: false,
-“error_type”: str,
-“error_message”: str
+    "id": "bc19488a-cc0e-4eaa-8d21-4d486a45392f",
+    "title": "My submenu 1",
+    "description": "My submenu description 1",
+    "dishes_count": 0
 }
 ```
 
-### 9. Пользователь может получить информацию о своём профиле:
+### 8. POST Создать подменю
 ```
-GET /api/users/me
-HTTP-Params:
-api-key: str
-```
-#### В ответ получаем:
-```
-{
-"result":"true",
-"user":{
-"id":"int",
-"name":"str",
-"followers":[{"id":"int", "name":"str"}],
-"following":[{"id":"int", "name":"str"}]
-}}
+127.0.0.1:8000/api/v1/menus/{menu_id}/submenus
 ```
 
-
-### 10. Пользователь может получить информацию о произвольном профиле по его
-```
-GET /api/users/<id>
-```
-#### В ответ получаем:
+Body
 ```
 {
-"result":"true",
-"user":{
-"id":"int",
-"name":"str",
-"followers":[{"id":"int", "name":"str"}],
-"following":[{"id":"int", "name":"str"}]
-}}
+    "title": "My submenu 1",
+    "description": "My submenu description 1"
+}
+```
+
+Response
+```
+{
+    "id": "bc19488a-cc0e-4eaa-8d21-4d486a45392f",
+    "title": "My submenu 1",
+    "description": "My submenu description 1",
+    "dishes_count": 0
+}
+```
+
+### 9. PATCH Обновить подменю
+```
+127.0.0.1:8000/api/v1/menus/{menu_id}/submenus/{submenu_id}
+```
+
+Body
+```
+{
+    "title": "My updated submenu 1",
+    "description": "My updated submenu description 1"
+}
+```
+
+Response
+```
+{
+    "id": "bc19488a-cc0e-4eaa-8d21-4d486a45392f",
+    "title": "My updated submenu 1",
+    "description": "My updated submenu description 1",
+    "dishes_count": 0
+}
+```
+
+### 10. DELETE Удалить меню
+```
+127.0.0.1:8000/api/v1/menus/{menu_id}/submenus/{submenu_id}
+```
+
+Response
+```
+{
+    "status": true,
+    "message": "The submenu has been deleted"
+}
+```
+
+### 11. GET Просмотр списка блюд
+```
+127.0.0.1:8000/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes
+```
+
+Response
+```
+[
+    {
+        "id": "602033b3-0462-4de1-a2f8-d8494795e0c0",
+        "title": "My dish 1",
+        "description": "My dish description 1",
+        "price": "12.50"
+    }
+]
+```
+
+### 12. GET Просмотр определенного блюда
+```
+127.0.0.1:8000/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}
+```
+
+Response
+```
+{
+    "id": "602033b3-0462-4de1-a2f8-d8494795e0c0",
+    "title": "My dish 1",
+    "description": "My dish description 1",
+    "price": "12.50"
+}
+```
+
+### 13. POST Создать блюдо
+```
+127.0.0.1:8000/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes
+```
+
+Body
+```
+{
+    "title": "My dish 1",
+    "description": "My dish description 1",
+    "price": "12.50"
+}
+```
+
+Response
+```
+{
+    "id": "602033b3-0462-4de1-a2f8-d8494795e0c0",
+    "title": "My dish 1",
+    "description": "My dish description 1",
+    "price": "12.50"
+}
+```
+
+### 9. PATCH Обновить блюдо
+```
+127.0.0.1:8000/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}
+```
+
+Body
+```
+{
+    "title": "My updated dish 1",
+    "description": "My updated dish description 1",
+    "price": "14.50"
+}
+```
+
+Response
+```
+{
+    "id": "602033b3-0462-4de1-a2f8-d8494795e0c0",
+    "title": "My updated dish 1",
+    "description": "My updated dish description 1",
+    "price": "14.50"
+}
+```
+
+### 10. DELETE Удалить блюдо
+```
+127.0.0.1:8000/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}
+```
+
+Response
+```
+{
+    "status": true,
+    "message": "The dish has been deleted"
+}
 ```
 
 ## Авторы
