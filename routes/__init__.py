@@ -1,0 +1,1 @@
+from . import routes_for_menu, routes_for_submenu, routes_for_dish

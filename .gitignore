@@ -1,0 +1,425 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+#ruff
+.ruff_cache/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VSCode
+.vscode/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django stuff:
+*.log
+local_settings.py
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyInstaller
+dist/
+build/
+*.exe
+*.spec
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Enthought Canopy
+__build/
+*.egg-info/
+dist-info/
+.enthought/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don’t work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# pytype
+.pytype/
+
+# pytest
+.pytest_cache/
+
+# pyright
+.pyright/
+
+# node
+node_modules/
+jspm_packages/
+
+# Meteor
+.meteor/local/
+/.history
+
+# UI5
+/resources/
+
+# Yarn
+.yarn/*
+!.yarn/empty
+/dist
+/node_modules
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# svelte
+__sapper__/
+
+# Rollup
+.rollup.cache/
+.rollup.config.js
+
+# npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnp.js
+
+# yarn
+.yarn-integrity
+.lock
+
+# parcel
+.cache/
+dist/
+.cache
+.parcel-cache
+
+# Dart
+.dart_tool/
+.packages
+.pub-cache/
+
+# ESLint
+node_modules/
+*.log
+
+# TypeScript
+*.tsbuildinfo
+
+# parcel
+.cache/
+dist/
+.cache
+.parcel-cache
+
+# Yarn
+.yarn/*
+!.yarn/empty
+dist/*
+node_modules/
+.cache/
+/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnp.js
+
+# Testing
+test_tmp/
+.history
+!assets/
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+test.c
+
+# Lua
+*.swp
+
+# Ruby
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
+/tmp/
+
+# Java
+*.class
+*.war
+*.ear
+*.jar
+
+# Leiningen
+target/
+
+# .NET
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code directories
+.vscode/
+.idea/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# JetBrains Rider
+.idea/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# JetBrains Rider
+.idea/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# JetBrains Rider
+.idea/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Image files
+*.bmp
+*.dds
+*.gif
+*.ico
+*.jpg
+*.png
+*.psd
+*.svg
+*.tif
+*.tiff
+*.webp
+
+# Audio files
+*.aac
+*.flac
+*.m4a
+*.mp3
+*.ogg
+*.opus
+*.wav
+*.wma
+
+# Video files
+*.avi
+*.flv
+*.mkv
+*.mov
+*.mp4
+*.mpeg
+*.mpg
+*.ogv
+*.webm
+*.wmv
+
+# Precompiled WebAssembly (.wasm)
+*.wasm
+
+# Compiled C++ Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.dylib
+*.dll
+*.so
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+*.dll.a
+*.dylib.a
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.armv6
+*.armv7
+*.arm64
+*.ppc64
+*.ppc
+*.mips64
+*.mips
+
+# Folders
+__pycache__
+.idea
+.vscode
