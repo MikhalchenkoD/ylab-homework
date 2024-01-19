@@ -35,18 +35,22 @@
     ```bash
       python -m venv venv
     ```
+    
       Активация виртуального окружения для Windows
    ```bash
       venv\Scripts\activate
     ```
+
       Активация виртуального окружения для macOS и Linux
    ```bash
       source venv/bin/activate
     ```
 ### 3. Установка зависимостей:
+
    ```bash
     pip install -r requirements.txt
     ```
+
 ### 4. Подготовка БД:
    
     Замените URL подлючения к БД на свой. URL находится в database/database в переменой engine_url:
@@ -64,6 +68,7 @@
    alembic upgrade head
    ```
 ### 5. Запуск приложения:
+
     ```bash
     python main.py
     ```
