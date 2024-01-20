@@ -53,12 +53,12 @@
 
 4. Подготовка БД:
    
-    Замените URL подлючения к БД на свой. URL находится в database/database в переменой engine_url:
+    Замените URL подлючения к БД на свой. URL находится в database/database в переменой engine:
     ```
     "postgresql+asyncpg://postgres:1234@localhost/ylab1"
     ```
     
-    Также замените URL подключения к БД в файле alembic.ini:
+    Также замените URL подключения к БД в файле alembic.ini в переменой sqlalchemy.url:
     ```
     postgresql://postgres:1234@localhost/ylab1
     ```
