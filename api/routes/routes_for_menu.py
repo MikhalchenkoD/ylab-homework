@@ -4,11 +4,11 @@ from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from database.models import Menu, Submenu
-from main import app, BASE_API_URL
-import utils.schemas as schemas
+from api.database.models import Menu, Submenu
+from api.main import app, BASE_API_URL
+from api import utils as schemas
 from typing import List, Sequence
-from database.database import get_async_session
+from api.database.database import get_async_session
 from fastapi import HTTPException, status
 
 

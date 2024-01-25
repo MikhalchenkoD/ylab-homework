@@ -5,10 +5,10 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.database import get_async_session
-from main import app, BASE_API_URL
-from utils import schemas
-from database.models import Dish, Submenu
+from api.database.database import get_async_session
+from api.main import app, BASE_API_URL
+from api.utils import schemas
+from api.database.models import Dish, Submenu
 
 
 @app.get(

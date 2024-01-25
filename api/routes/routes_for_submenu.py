@@ -6,10 +6,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from database.database import get_async_session
-from main import app, BASE_API_URL
-from database.models import Submenu
-from utils import schemas
+from api.database.database import get_async_session
+from api.main import app, BASE_API_URL
+from api.database.models import Submenu
+from api.utils import schemas
 
 
 @app.get(
