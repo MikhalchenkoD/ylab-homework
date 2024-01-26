@@ -54,7 +54,7 @@
     docker-compose -f docker-compose-main.yaml up
     ```
 
-    Завершение работы контейнера(cntl + c может не сработать):
+    Завершение работы контейнера(cntrl + c может не сработать):
    ```bash
    docker-compose -f docker-compose-main.yaml down
    ```
@@ -67,7 +67,7 @@
     docker-compose -f docker-compose-test.yaml up
     ```
 
-    Завершение работы контейнера(cntl + c может не сработать):
+    Завершение работы контейнера(cntrl + c может не сработать):
    ```bash
    docker-compose -f docker-compose-test.yaml down
    ```
