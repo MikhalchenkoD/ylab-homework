@@ -41,7 +41,7 @@
 
     Завершение работы контейнера(cntrl + c может не сработать):
    ```bash
-   docker-compose -f docker-compose-main.yaml down
+   docker-compose -f docker-compose-main.yaml stop
    ```
 3. Сборка и запуск контейнера с тестами(убедитесь, что у вас установлен docker):
 
@@ -54,7 +54,7 @@
 
     Завершение работы контейнера(cntrl + c может не сработать):
    ```bash
-   docker-compose -f docker-compose-test.yaml down
+   docker-compose -f docker-compose-test.yaml stop
    ```
 
 ## Edpoints
