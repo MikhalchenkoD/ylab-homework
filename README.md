@@ -45,33 +45,32 @@
    ```bash
       source venv/bin/activate
     ```
-3. Установка зависимостей:
+3. Сборка и запуск основного контейнера(убедитесь, что у вас установлен docker):
 
    ```bash
-    pip install -r requirements.txt
+    docker-compose -f docker-compose-main.yaml build
+    ```
+      ```bash
+    docker-compose -f docker-compose-main.yaml up
     ```
 
-4. Подготовка БД:
-   
-    Замените URL подлючения к БД на свой. URL находится в database/database в переменой engine:
-    ```
-    "postgresql+asyncpg://postgres:1234@localhost/ylab1"
-    ```
-    
-    Также замените URL подключения к БД в файле alembic.ini в переменой sqlalchemy.url:
-    ```
-    postgresql://postgres:1234@localhost/ylab1
-    ```
-
-    Выполните миграции
+    Завершение работы контейнера(cntl + c может не сработать):
    ```bash
-   alembic upgrade head
+   docker-compose -f docker-compose-main.yaml down
    ```
-5. Запуск приложения:
+4. Сборка и запуск контейнера с тестами(убедитесь, что у вас установлен docker):
 
-    ```bash
-    python main.py
+   ```bash
+    docker-compose -f docker-compose-test.yaml build
     ```
+      ```bash
+    docker-compose -f docker-compose-test.yaml up
+    ```
+
+    Завершение работы контейнера(cntl + c может не сработать):
+   ```bash
+   docker-compose -f docker-compose-test.yaml down
+   ```
 
 ## Edpoints
 ### 1. GET Просмотр списка меню
