@@ -1,24 +1,25 @@
 import uuid
 
-from fastapi import Depends
+from fastapi import Depends, APIRouter
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from api.database.models import Menu, Submenu
-from api.main import app, BASE_API_URL
-from api import utils as schemas
+from database.models import Menu, Submenu
+from utils import schemas
 from typing import List, Sequence
-from api.database.database import get_async_session
+from database.database import get_async_session
 from fastapi import HTTPException, status
 
+menus_router = APIRouter(prefix=f"/menus", tags=["Menu"])
 
-@app.get(BASE_API_URL + "menus", response_model=List[schemas.MenuOut])
+
+@menus_router.get("/", response_model=List[schemas.MenuOut])
 async def get_list_menus(session: AsyncSession = Depends(get_async_session)) -> Sequence[Menu]:
     res = await session.execute(select(Menu).options(selectinload(Menu.submenus)))
     return res.scalars().all()
 
 
-@app.get(BASE_API_URL + "menus/{menu_id}", response_model=schemas.MenuOut)
+@menus_router.get("/{menu_id}", response_model=schemas.MenuOut)
 async def get_menu_by_id(menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)):
     res = await session.execute(
         select(Menu)
@@ -31,8 +32,8 @@ async def get_menu_by_id(menu_id: uuid.UUID, session: AsyncSession = Depends(get
     return menu
 
 
-@app.post(
-    BASE_API_URL + "menus",
+@menus_router.post(
+    "/",
     response_model=schemas.MenuOut,
     status_code=status.HTTP_201_CREATED,
 )
@@ -49,7 +50,7 @@ async def create_menu(
     return res.scalars().one_or_none()
 
 
-@app.patch(BASE_API_URL + "menus/{menu_id}", response_model=schemas.MenuOut)
+@menus_router.patch("/{menu_id}", response_model=schemas.MenuOut)
 async def update_menu_by_id(
         menu: schemas.MenuIn, menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
 ) -> Menu:
@@ -67,7 +68,7 @@ async def update_menu_by_id(
     return result
 
 
-@app.delete(BASE_API_URL + "menus/{menu_id}")
+@menus_router.delete("/{menu_id}")
 async def delete_menu_by_id(
         menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
 ) -> dict:

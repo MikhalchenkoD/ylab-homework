@@ -1,18 +1,19 @@
 from uuid import UUID, uuid4
 from typing import List, Sequence
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, APIRouter
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.database.database import get_async_session
-from api.main import app, BASE_API_URL
-from api.utils import schemas
-from api.database.models import Dish, Submenu
+from database.database import get_async_session
+from utils import schemas
+from database.models import Dish, Submenu
+
+dishes_router = APIRouter(prefix=f"/menus", tags=["Dish"])
 
 
-@app.get(
-    BASE_API_URL + "menus/{menu_id}/submenus/{submenu_id}/dishes",
+@dishes_router.get(
+    "/{menu_id}/submenus/{submenu_id}/dishes",
     response_model=List[schemas.DishOut],
 )
 async def get_list_dishes(
@@ -26,8 +27,8 @@ async def get_list_dishes(
     return res.scalars().all()
 
 
-@app.get(
-    BASE_API_URL + "menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
+@dishes_router.get(
+    "/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
     response_model=schemas.DishOut,
 )
 async def get_dish_by_id(
@@ -48,8 +49,8 @@ async def get_dish_by_id(
     return dish
 
 
-@app.post(
-    BASE_API_URL + "menus/{menu_id}/submenus/{submenu_id}/dishes",
+@dishes_router.post(
+    "/{menu_id}/submenus/{submenu_id}/dishes",
     response_model=schemas.DishOut,
     status_code=status.HTTP_201_CREATED,
 )
@@ -75,8 +76,8 @@ async def create_dish(
     return new_dish
 
 
-@app.patch(
-    BASE_API_URL + "menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
+@dishes_router.patch(
+    "/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
     response_model=schemas.DishOut,
 )
 async def update_dish_by_id(
@@ -104,7 +105,7 @@ async def update_dish_by_id(
     return result
 
 
-@app.delete(BASE_API_URL + "menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}")
+@dishes_router.delete("/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}")
 async def delete_dish_by_id(
         menu_id: UUID, submenu_id: UUID, dish_id: UUID, session: AsyncSession = Depends(get_async_session)
 ) -> dict:

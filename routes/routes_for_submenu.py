@@ -1,22 +1,23 @@
 import uuid
 from typing import List, Sequence
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, APIRouter
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from api.database.database import get_async_session
-from api.main import app, BASE_API_URL
-from api.database.models import Submenu
-from api.utils import schemas
+from database.database import get_async_session
+from database.models import Submenu
+from utils import schemas
+
+submenus_router = APIRouter(prefix=f"/menus", tags=["Submenu"])
 
 
-@app.get(
-    BASE_API_URL + "menus/{menu_id}/submenus", response_model=List[schemas.SubmenuOut]
+@submenus_router.get(
+    "/{menu_id}/submenus", response_model=List[schemas.SubmenuOut]
 )
 async def get_list_submenus(
-    menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
+        menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
 ) -> Sequence[Submenu]:
     res = await session.execute(
         select(Submenu)
@@ -26,12 +27,12 @@ async def get_list_submenus(
     return res.scalars().all()
 
 
-@app.get(
-    BASE_API_URL + "menus/{menu_id}/submenus/{submenu_id}",
+@submenus_router.get(
+    "/{menu_id}/submenus/{submenu_id}",
     response_model=schemas.SubmenuOut,
 )
 async def get_submenu_by_id(
-    menu_id: uuid.UUID, submenu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
+        menu_id: uuid.UUID, submenu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
 ) -> Submenu:
     res = await session.execute(
         select(Submenu)
@@ -44,15 +45,15 @@ async def get_submenu_by_id(
     return submenu
 
 
-@app.post(
-    BASE_API_URL + "menus/{menu_id}/submenus",
+@submenus_router.post(
+    "/{menu_id}/submenus",
     response_model=schemas.SubmenuOut,
     status_code=status.HTTP_201_CREATED,
 )
 async def create_submenu(
-    submenu: schemas.SubmenuIn,
-    menu_id: uuid.UUID,
-    session: AsyncSession = Depends(get_async_session),
+        submenu: schemas.SubmenuIn,
+        menu_id: uuid.UUID,
+        session: AsyncSession = Depends(get_async_session),
 ) -> Submenu:
     new_menu = Submenu(
         id=uuid.uuid4(),
@@ -71,15 +72,15 @@ async def create_submenu(
     return res.scalars().one_or_none()
 
 
-@app.patch(
-    BASE_API_URL + "menus/{menu_id}/submenus/{submenu_id}",
+@submenus_router.patch(
+    "/{menu_id}/submenus/{submenu_id}",
     response_model=schemas.SubmenuOut,
 )
 async def update_submenu_by_id(
-    submenu: schemas.SubmenuIn,
-    menu_id: uuid.UUID,
-    submenu_id: uuid.UUID,
-    session: AsyncSession = Depends(get_async_session),
+        submenu: schemas.SubmenuIn,
+        menu_id: uuid.UUID,
+        submenu_id: uuid.UUID,
+        session: AsyncSession = Depends(get_async_session),
 ) -> Submenu:
     res = await session.execute(
         select(Submenu)
@@ -95,9 +96,9 @@ async def update_submenu_by_id(
     return result
 
 
-@app.delete(BASE_API_URL + "menus/{menu_id}/submenus/{submenu_id}")
+@submenus_router.delete("/{menu_id}/submenus/{submenu_id}")
 async def delete_submenu_by_id(
-    menu_id: uuid.UUID, submenu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
+        menu_id: uuid.UUID, submenu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
 ) -> dict:
     res = await session.execute(
         select(Submenu).where(Submenu.menu_id == menu_id, Submenu.id == submenu_id)

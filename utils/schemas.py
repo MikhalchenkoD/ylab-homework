@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from pydantic import (
     BaseModel,
@@ -12,7 +12,13 @@ from pydantic import (
 class DishIn(BaseModel):
     title: str
     description: str
-    price: float
+    price: Union[float, str]
+
+    @field_validator("price")
+    def parse_price(cls, v: Union[float, str]):
+        if isinstance(v, str):
+            return float(v)
+        return v
 
 
 class DishOut(DishIn):
