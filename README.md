@@ -30,22 +30,7 @@
     cd ylab-homework
     ```
 
-2. Создание и активация виртуального окружения:
-
-    ```bash
-      python -m venv venv
-    ```
-    
-      Активация виртуального окружения для Windows
-   ```bash
-      venv\Scripts\activate
-    ```
-
-      Активация виртуального окружения для macOS и Linux
-   ```bash
-      source venv/bin/activate
-    ```
-3. Сборка и запуск основного контейнера(убедитесь, что у вас установлен docker):
+2. Сборка и запуск основного контейнера(убедитесь, что у вас установлен docker):
 
    ```bash
     docker-compose -f docker-compose-main.yaml build
@@ -58,7 +43,7 @@
    ```bash
    docker-compose -f docker-compose-main.yaml down
    ```
-4. Сборка и запуск контейнера с тестами(убедитесь, что у вас установлен docker):
+3. Сборка и запуск контейнера с тестами(убедитесь, что у вас установлен docker):
 
    ```bash
     docker-compose -f docker-compose-test.yaml build
