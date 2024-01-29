@@ -133,6 +133,12 @@ async def test_delete_submenu(ac: AsyncClient, buffer_data):
 
     assert response.status_code == 200
 
+    async with TestingSessionLocal() as session:
+        res = await session.execute(select(Submenu).where(Submenu.id == buffer_data['submenu']['id']))
+        deleted_submenu = res.scalars().one_or_none()
+
+        assert deleted_submenu is None
+
 
 async def test_get_list_submenu_after_delete_submenu(ac: AsyncClient, buffer_data):
     response = await ac.get(f"/api/v1/menus/{buffer_data['menu']['id']}/submenus")
