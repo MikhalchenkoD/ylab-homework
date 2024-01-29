@@ -33,6 +33,6 @@ class Dish(Base):
     id = Column(UUID(as_uuid=True), primary_key=True)
     title = Column(String)
     description = Column(String)
-    price = Column(Float)
+    price = Column(String)
     submenu_id = Column(UUID(as_uuid=True), ForeignKey("submenu.id"))
     submenu = relationship("Submenu", back_populates="dishes")

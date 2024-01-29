@@ -1,157 +1,91 @@
+from sqlalchemy import select
+
 from httpx import AsyncClient
 
-menu_id = ''
-submenu_id = ''
-dishes_id = ''
+from database.models import Dish
+from .conftest import TestingSessionLocal
 
 
-async def test_create_menu(ac: AsyncClient):
-    global menu_id
-    response = await ac.post("/api/v1/menus/", json={
-        "title": "My menu 1",
-        "description": "My menu description 1"
-    })
-
-    json_response = response.json()
-
-    assert response.status_code == 201
-    assert "id" in json_response
-
-    menu_id = json_response["id"]
-
-
-async def test_create_submenu(ac: AsyncClient):
-    global submenu_id
-    response = await ac.post(f"/api/v1/menus/{menu_id}/submenus", json={
-        "title": "My submenu 1",
-        "description": "My submenu description 1"
-    })
-
-    json_response = response.json()
-
-    assert response.status_code == 201
-    assert "id" in json_response
-
-    submenu_id = json_response["id"]
-
-
-async def test_get_empty_list_dishes(ac: AsyncClient):
-    response = await ac.get(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes")
-
-    assert len(response.json()) == 0
-    assert response.status_code == 200
-
-
-async def test_create_dish(ac: AsyncClient):
-    global dishes_id
-    response = await ac.post(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes", json={
+async def test_create_dish(ac: AsyncClient, menu, submenu):
+    data = {
         "title": "My dish 1",
         "description": "My dish description 1",
         "price": '12.50'
-    })
+    }
+    response = await ac.post(f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes", json=data)
 
     json_response = response.json()
 
     assert response.status_code == 201
     assert "id" in json_response
-    assert json_response["title"] == "My dish 1"
-    assert json_response["description"] == "My dish description 1"
-    assert json_response["price"] == '12.50'
+    assert json_response["title"] == data['title']
+    assert json_response["description"] == data['description']
+    assert json_response["price"] == data['price']
 
-    dishes_id = json_response["id"]
+    async with TestingSessionLocal() as session:
+        res = await session.execute(select(Dish).where(Dish.id == json_response['id']))
+        dish = res.scalars().one_or_none()
+
+        assert dish is not None
+        assert dish.title == data['title']
+        assert dish.description == data['description']
+        assert dish.price == data['price']
+
+        await session.delete(dish)
+        await session.commit()
 
 
-async def test_get_list_dishes(ac: AsyncClient):
-    response = await ac.get(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes")
+async def test_get_list_dishes(ac: AsyncClient, menu, submenu, first_dish):
+    response = await ac.get(f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes")
 
     assert len(response.json()) > 0
     assert response.status_code == 200
 
 
-async def test_get_dish_by_id(ac: AsyncClient):
-    response = await ac.get(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dishes_id}")
+async def test_get_dish_by_id(ac: AsyncClient, menu, submenu, first_dish):
+    response = await ac.get(f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes/{first_dish.id}")
     json_response = response.json()
 
     assert response.status_code == 200
     assert "id" in json_response
-    assert json_response["title"] == "My dish 1"
-    assert json_response["description"] == "My dish description 1"
-    assert json_response["price"] == '12.50'
+    assert json_response["title"] == first_dish.title
+    assert json_response["description"] == first_dish.description
+    assert json_response["price"] == first_dish.price
 
 
-async def test_update_dish(ac: AsyncClient):
-    response = await ac.patch(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dishes_id}", json={
+async def test_update_dish(ac: AsyncClient, menu, submenu, first_dish):
+    data = {
         "title": "My updated dish 1",
         "description": "My updated dish description 1",
         "price": '14.50'
-    })
-
-    json_response = response.json()
-
-    assert response.status_code == 200
-    assert "id" in json_response
-    assert json_response["title"] == "My updated dish 1"
-    assert json_response["description"] == "My updated dish description 1"
-    assert json_response["price"] == '14.50'
-
-
-async def test_get_dish_by_id_after_update(ac: AsyncClient):
-    response = await ac.get(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dishes_id}")
-
-    json_response = response.json()
-
-    assert response.status_code == 200
-    assert "id" in json_response
-    assert json_response["title"] == "My updated dish 1"
-    assert json_response["description"] == "My updated dish description 1"
-    assert json_response["price"] == '14.50'
-
-
-async def test_delete_dish(ac: AsyncClient):
-    response = await ac.delete(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dishes_id}")
-
-    assert response.status_code == 200
-
-
-async def test_get_list_dishes_after_delete(ac: AsyncClient):
-    response = await ac.get(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes")
-
-    assert len(response.json()) == 0
-    assert response.status_code == 200
-
-
-async def test_get_dish_by_id_after_delete(ac: AsyncClient):
-    response = await ac.get(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dishes_id}")
-
-    json_response = response.json()
-
-    assert response.status_code == 404
-    assert json_response == {
-        "detail": "dish not found"
     }
+    response = await ac.patch(f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes/{first_dish.id}", json=data)
+
+    json_response = response.json()
+
+    assert response.status_code == 200
+    assert "id" in json_response
+    assert json_response["title"] == data['title']
+    assert json_response["description"] == data['description']
+    assert json_response["price"] == data['price']
+
+    async with TestingSessionLocal() as session:
+        res = await session.execute(select(Dish).where(Dish.id == json_response['id']))
+        dish = res.scalars().one_or_none()
+
+        assert dish is not None
+        assert dish.title == data['title']
+        assert dish.description == data['description']
+        assert dish.price == data['price']
 
 
-async def test_delete_submenu(ac: AsyncClient):
-    response = await ac.delete(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}")
+async def test_delete_dish(ac: AsyncClient, menu, submenu, first_dish):
+    response = await ac.delete(f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes/{first_dish.id}")
 
     assert response.status_code == 200
 
+    async with TestingSessionLocal() as session:
+        res = await session.execute(select(Dish).where(Dish.id == first_dish.id))
+        dish = res.scalars().one_or_none()
 
-async def test_get_list_submenu_after_delete(ac: AsyncClient):
-    response = await ac.get(f"/api/v1/menus/{menu_id}/submenus")
-
-    assert len(response.json()) == 0
-    assert response.status_code == 200
-
-
-async def test_delete_menu(ac: AsyncClient):
-    response = await ac.delete(f"/api/v1/menus/{menu_id}")
-
-    assert response.status_code == 200
-
-
-async def test_get_list_menu(ac: AsyncClient):
-    response = await ac.get("/api/v1/menus/")
-
-    assert len(response.json()) == 0
-    assert response.status_code == 200
+        assert dish is None

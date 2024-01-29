@@ -2,12 +2,12 @@ import uuid
 from typing import List, Sequence
 
 from fastapi import Depends, HTTPException, status, APIRouter
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from database.database import get_async_session
-from database.models import Submenu
+from database.models import Submenu, Dish
 from utils import schemas
 
 submenus_router = APIRouter(prefix=f"/menus", tags=["Submenu"])
@@ -18,13 +18,29 @@ submenus_router = APIRouter(prefix=f"/menus", tags=["Submenu"])
 )
 async def get_list_submenus(
         menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
-) -> Sequence[Submenu]:
+) -> List[schemas.SubmenuOut]:
     res = await session.execute(
-        select(Submenu)
-        .options(selectinload(Submenu.dishes))
-        .where(Submenu.menu_id == menu_id)
+        select(
+            Submenu,
+            func.count(func.distinct(Dish.id)).label("dishes_count")
+        )
+        .outerjoin(Dish, Submenu.id == Dish.submenu_id)
+        .group_by(Submenu.id, Submenu.title, Submenu.description)
     )
-    return res.scalars().all()
+
+    result = res.fetchall()
+
+    result_submenus = []
+    for submenu_obj, dishes_count in result:
+        submenu_out = schemas.SubmenuOut(
+            id=submenu_obj.id,
+            title=submenu_obj.title,
+            description=submenu_obj.description,
+            dishes_count=dishes_count
+        )
+        result_submenus.append(submenu_out)
+
+    return result_submenus
 
 
 @submenus_router.get(
@@ -33,16 +49,32 @@ async def get_list_submenus(
 )
 async def get_submenu_by_id(
         menu_id: uuid.UUID, submenu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
-) -> Submenu:
+) -> schemas.SubmenuOut:
     res = await session.execute(
-        select(Submenu)
-        .options(selectinload(Submenu.dishes))
+        select(
+            Submenu,
+            func.count(func.distinct(Dish.id)).label("dishes_count")
+        )
+        .outerjoin(Dish, Submenu.id == Dish.submenu_id)
         .where(Submenu.menu_id == menu_id, Submenu.id == submenu_id)
+        .group_by(Submenu.id, Submenu.title, Submenu.description)
     )
-    submenu = res.scalars().one_or_none()
-    if not submenu:
-        raise HTTPException(status_code=404, detail="submenu not found")
-    return submenu
+
+    result = res.fetchone()
+
+    if result:
+        submenu_obj, dishes_count = result
+        submenu_out = schemas.SubmenuOut(
+            id=submenu_obj.id,
+            title=submenu_obj.title,
+            description=submenu_obj.description,
+            dishes_count=dishes_count
+        )
+
+        return submenu_out
+
+    raise HTTPException(status_code=404, detail="submenu not found")
+
 
 
 @submenus_router.post(
@@ -54,7 +86,7 @@ async def create_submenu(
         submenu: schemas.SubmenuIn,
         menu_id: uuid.UUID,
         session: AsyncSession = Depends(get_async_session),
-) -> Submenu:
+) -> schemas.SubmenuOut:
     new_menu = Submenu(
         id=uuid.uuid4(),
         title=submenu.title,
@@ -65,11 +97,27 @@ async def create_submenu(
     await session.commit()
 
     res = await session.execute(
-        select(Submenu)
-        .options(selectinload(Submenu.dishes))
-        .where(Submenu.id == new_menu.id)
+        select(
+            Submenu,
+            func.count(func.distinct(Dish.id)).label("dishes_count")
+        )
+        .outerjoin(Dish, Submenu.id == Dish.submenu_id)
+        .where(Submenu.menu_id == menu_id, Submenu.id == new_menu.id)
+        .group_by(Submenu.id, Submenu.title, Submenu.description)
     )
-    return res.scalars().one_or_none()
+
+    result = res.fetchone()
+
+    if result:
+        submenu_obj, dishes_count = result
+        submenu_out = schemas.SubmenuOut(
+            id=submenu_obj.id,
+            title=submenu_obj.title,
+            description=submenu_obj.description,
+            dishes_count=dishes_count
+        )
+
+        return submenu_out
 
 
 @submenus_router.patch(
@@ -81,19 +129,33 @@ async def update_submenu_by_id(
         menu_id: uuid.UUID,
         submenu_id: uuid.UUID,
         session: AsyncSession = Depends(get_async_session),
-) -> Submenu:
+) -> schemas.SubmenuOut:
     res = await session.execute(
-        select(Submenu)
-        .options(selectinload(Submenu.dishes))
+        select(
+            Submenu,
+            func.count(func.distinct(Dish.id)).label("dishes_count")
+        )
+        .outerjoin(Dish, Submenu.id == Dish.submenu_id)
         .where(Submenu.menu_id == menu_id, Submenu.id == submenu_id)
+        .group_by(Submenu.id, Submenu.title, Submenu.description)
     )
-    result = res.scalars().one_or_none()
-    result.title = submenu.title
-    result.description = submenu.description
 
-    await session.commit()
+    result = res.fetchone()
 
-    return result
+    if result:
+        submenu_obj, dishes_count = result
+        submenu_obj.title = submenu.title
+        submenu_obj.description = submenu.description
+        await session.commit()
+
+        submenu_out = schemas.SubmenuOut(
+            id=submenu_obj.id,
+            title=submenu_obj.title,
+            description=submenu_obj.description,
+            dishes_count=dishes_count
+        )
+
+        return submenu_out
 
 
 @submenus_router.delete("/{menu_id}/submenus/{submenu_id}")
