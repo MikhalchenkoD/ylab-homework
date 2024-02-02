@@ -3,23 +3,24 @@ from sqlalchemy import select
 from httpx import AsyncClient
 
 from database.models import Dish, Menu, Submenu
-from .conftest import TestingSessionLocal
+from .conftest import TestingSessionLocal, reverse
 
 
 async def test_create_menu(ac: AsyncClient, buffer_data):
     data = {
-        "title": "My menu 1",
-        "description": "My menu description 1"
+        'title': 'My menu 1',
+        'description': 'My menu description 1'
     }
-    response = await ac.post("/api/v1/menus/", json=data)
+    url = await reverse('create_menu')
+    response = await ac.post(url, json=data)
 
     json_response = response.json()
     buffer_data.update(menu=json_response)
 
     assert response.status_code == 201
-    assert "id" in json_response
-    assert json_response["title"] == data["title"]
-    assert json_response["description"] == data["description"]
+    assert 'id' in json_response
+    assert json_response['title'] == data['title']
+    assert json_response['description'] == data['description']
 
     async with TestingSessionLocal() as session:
         res = await session.execute(select(Menu).where(Menu.id == json_response['id']))
@@ -32,18 +33,19 @@ async def test_create_menu(ac: AsyncClient, buffer_data):
 
 async def test_create_submenu(ac: AsyncClient, buffer_data):
     data = {
-        "title": "My submenu 1",
-        "description": "My submenu description 1"
+        'title': 'My submenu 1',
+        'description': 'My submenu description 1'
     }
-    response = await ac.post(f"/api/v1/menus/{buffer_data['menu']['id']}/submenus", json=data)
+    url = await reverse('create_submenu', menu_id=buffer_data['menu']['id'])
+    response = await ac.post(url, json=data)
 
     json_response = response.json()
     buffer_data.update(submenu=response.json())
 
     assert response.status_code == 201
-    assert "id" in json_response
-    assert json_response["title"] == data['title']
-    assert json_response["description"] == data['description']
+    assert 'id' in json_response
+    assert json_response['title'] == data['title']
+    assert json_response['description'] == data['description']
 
     async with TestingSessionLocal() as session:
         res = await session.execute(select(Submenu).where(Submenu.id == json_response['id']))
@@ -55,7 +57,8 @@ async def test_create_submenu(ac: AsyncClient, buffer_data):
 
 
 async def test_get_empty_list_dishes(ac: AsyncClient, buffer_data):
-    response = await ac.get(f"/api/v1/menus/{buffer_data['menu']['id']}/submenus/{buffer_data['submenu']['id']}/dishes")
+    url = await reverse('get_list_dishes', menu_id=buffer_data['menu']['id'], submenu_id=buffer_data['submenu']['id'])
+    response = await ac.get(url)
 
     assert response.status_code == 200
     assert len(response.json()) == 0
@@ -63,21 +66,21 @@ async def test_get_empty_list_dishes(ac: AsyncClient, buffer_data):
 
 async def test_create_dish(ac: AsyncClient, buffer_data):
     data = {
-        "title": "My dish 1",
-        "description": "My dish description 1",
-        "price": '12.50'
+        'title': 'My dish 1',
+        'description': 'My dish description 1',
+        'price': '12.50'
     }
-    response = await ac.post(
-        f"/api/v1/menus/{buffer_data['menu']['id']}/submenus/{buffer_data['submenu']['id']}/dishes", json=data)
+    url = await reverse('create_dish', menu_id=buffer_data['menu']['id'], submenu_id=buffer_data['submenu']['id'])
+    response = await ac.post(url, json=data)
 
     json_response = response.json()
     buffer_data.update(dish=json_response)
 
     assert response.status_code == 201
-    assert "id" in json_response
-    assert json_response["title"] == data['title']
-    assert json_response["description"] == data['description']
-    assert json_response["price"] == data['price']
+    assert 'id' in json_response
+    assert json_response['title'] == data['title']
+    assert json_response['description'] == data['description']
+    assert json_response['price'] == data['price']
 
     async with TestingSessionLocal() as session:
         res = await session.execute(select(Dish).where(Dish.id == json_response['id']))
@@ -90,42 +93,43 @@ async def test_create_dish(ac: AsyncClient, buffer_data):
 
 
 async def test_get_list_dishes(ac: AsyncClient, buffer_data):
-    response = await ac.get(f"/api/v1/menus/{buffer_data['menu']['id']}/submenus/{buffer_data['submenu']['id']}/dishes")
+    url = await reverse('get_list_dishes', menu_id=buffer_data['menu']['id'], submenu_id=buffer_data['submenu']['id'])
+    response = await ac.get(url)
 
     assert len(response.json()) > 0
     assert response.status_code == 200
 
 
 async def test_get_dish_by_id(ac: AsyncClient, buffer_data):
-    response = await ac.get(
-        f"/api/v1/menus/{buffer_data['menu']['id']}/submenus/{buffer_data['submenu']['id']}/dishes/{buffer_data['dish']['id']}")
+    url = await reverse('get_dish_by_id', menu_id=buffer_data['menu']['id'], submenu_id=buffer_data['submenu']['id'], dish_id=buffer_data['dish']['id'])
+    response = await ac.get(url)
     json_response = response.json()
 
     assert response.status_code == 200
-    assert "id" in json_response
-    assert json_response["title"] == buffer_data['dish']['title']
-    assert json_response["description"] == buffer_data['dish']['description']
-    assert json_response["price"] == buffer_data['dish']['price']
+    assert 'id' in json_response
+    assert json_response['title'] == buffer_data['dish']['title']
+    assert json_response['description'] == buffer_data['dish']['description']
+    assert json_response['price'] == buffer_data['dish']['price']
 
 
 async def test_update_dish(ac: AsyncClient, buffer_data):
     data = {
-        "title": "My updated dish 1",
-        "description": "My updated dish description 1",
-        "price": '14.50'
+        'title': 'My updated dish 1',
+        'description': 'My updated dish description 1',
+        'price': '14.50'
     }
-    response = await ac.patch(
-        f"/api/v1/menus/{buffer_data['menu']['id']}/submenus/{buffer_data['submenu']['id']}/dishes/{buffer_data['dish']['id']}",
-        json=data)
+    url = await reverse('update_dish_by_id', menu_id=buffer_data['menu']['id'], submenu_id=buffer_data['submenu']['id'],
+                        dish_id=buffer_data['dish']['id'])
+    response = await ac.patch(url, json=data)
 
     json_response = response.json()
     buffer_data.update(dish=json_response)
 
     assert response.status_code == 200
-    assert "id" in json_response
-    assert json_response["title"] == data['title']
-    assert json_response["description"] == data['description']
-    assert json_response["price"] == data['price']
+    assert 'id' in json_response
+    assert json_response['title'] == data['title']
+    assert json_response['description'] == data['description']
+    assert json_response['price'] == data['price']
 
     async with TestingSessionLocal() as session:
         res = await session.execute(select(Dish).where(Dish.id == json_response['id']))
@@ -138,20 +142,21 @@ async def test_update_dish(ac: AsyncClient, buffer_data):
 
 
 async def test_get_dish_by_id_after_update(ac: AsyncClient, buffer_data):
-    response = await ac.get(
-        f"/api/v1/menus/{buffer_data['menu']['id']}/submenus/{buffer_data['submenu']['id']}/dishes/{buffer_data['dish']['id']}")
+    url = await reverse('get_dish_by_id', menu_id=buffer_data['menu']['id'], submenu_id=buffer_data['submenu']['id'], dish_id=buffer_data['dish']['id'])
+    response = await ac.get(url)
     json_response = response.json()
 
     assert response.status_code == 200
-    assert "id" in json_response
-    assert json_response["title"] == buffer_data['dish']['title']
-    assert json_response["description"] == buffer_data['dish']['description']
-    assert json_response["price"] == buffer_data['dish']['price']
+    assert 'id' in json_response
+    assert json_response['title'] == buffer_data['dish']['title']
+    assert json_response['description'] == buffer_data['dish']['description']
+    assert json_response['price'] == buffer_data['dish']['price']
 
 
 async def test_delete_dish(ac: AsyncClient, buffer_data):
-    response = await ac.delete(
-        f"/api/v1/menus/{buffer_data['menu']['id']}/submenus/{buffer_data['submenu']['id']}/dishes/{buffer_data['dish']['id']}")
+    url = await reverse('delete_dish_by_id', menu_id=buffer_data['menu']['id'], submenu_id=buffer_data['submenu']['id'],
+                        dish_id=buffer_data['dish']['id'])
+    response = await ac.delete(url)
 
     assert response.status_code == 200
 
@@ -163,23 +168,25 @@ async def test_delete_dish(ac: AsyncClient, buffer_data):
 
 
 async def test_get_list_dishes_after_delete(ac: AsyncClient, buffer_data):
-    response = await ac.get(f"/api/v1/menus/{buffer_data['menu']['id']}/submenus/{buffer_data['submenu']['id']}/dishes")
+    url = await reverse('get_list_dishes', menu_id=buffer_data['menu']['id'], submenu_id=buffer_data['submenu']['id'])
+    response = await ac.get(url)
 
     assert len(response.json()) == 0
     assert response.status_code == 200
 
 
 async def test_get_dish_by_id_after_delete(ac: AsyncClient, buffer_data):
-    response = await ac.get(
-        f"/api/v1/menus/{buffer_data['menu']['id']}/submenus/{buffer_data['submenu']['id']}/dishes/{buffer_data['dish']['id']}")
+    url = await reverse('get_dish_by_id', menu_id=buffer_data['menu']['id'], submenu_id=buffer_data['submenu']['id'], dish_id=buffer_data['dish']['id'])
+    response = await ac.get(url)
     json_response = response.json()
 
     assert response.status_code == 404
-    assert json_response == {"detail": "dish not found"}
+    assert json_response == {'detail': 'dish not found'}
 
 
 async def test_delete_submenu(ac: AsyncClient, buffer_data):
-    response = await ac.delete(f"/api/v1/menus/{buffer_data['menu']['id']}/submenus/{buffer_data['submenu']['id']}")
+    url = await reverse('delete_submenu_by_id', menu_id=buffer_data['menu']['id'], submenu_id=buffer_data['submenu']['id'])
+    response = await ac.delete(url)
 
     assert response.status_code == 200
 
@@ -191,14 +198,16 @@ async def test_delete_submenu(ac: AsyncClient, buffer_data):
 
 
 async def test_get_list_submenus_after_delete(ac: AsyncClient, buffer_data):
-    response = await ac.get(f"/api/v1/menus/{buffer_data['menu']['id']}/submenus")
+    url = await reverse('get_list_submenus', menu_id=buffer_data['menu']['id'])
+    response = await ac.get(url)
 
     assert response.status_code == 200
     assert len(response.json()) == 0
 
 
 async def test_delete_menu(ac: AsyncClient, buffer_data):
-    response = await ac.delete(f"/api/v1/menus/{buffer_data['menu']['id']}")
+    url = await reverse('delete_menu_by_id', menu_id=buffer_data['menu']['id'])
+    response = await ac.delete(url)
 
     assert response.status_code == 200
 
@@ -210,7 +219,8 @@ async def test_delete_menu(ac: AsyncClient, buffer_data):
 
 
 async def test_get_list_menus_after_delete(ac: AsyncClient, buffer_data):
-    response = await ac.get("/api/v1/menus/")
+    url = await reverse('get_list_menus')
+    response = await ac.get(url)
 
     assert response.status_code == 200
     assert len(response.json()) == 0

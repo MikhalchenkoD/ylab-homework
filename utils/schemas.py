@@ -1,11 +1,8 @@
-from typing import List, Union
-
 from pydantic import (
     BaseModel,
     field_validator,
-    computed_field,
+    ValidationError,
     UUID4,
-    Field,
 )
 
 
@@ -18,10 +15,14 @@ class DishIn(BaseModel):
 class DishOut(DishIn):
     id: UUID4
 
-    @field_validator("price")
-    def round_price(cls, v: str):
-        v = float(v)
-        return str("{:.2f}".format(v))
+    @field_validator('price')
+    def round_price(cls, v: str) -> str:
+        try:
+            price_float = float(v)
+        except ValueError:
+            raise ValidationError('Invalid price format')
+
+        return str(f'{price_float:.2f}')
 
 
 class SubmenuIn(BaseModel):
@@ -43,3 +44,8 @@ class MenuOut(MenuIn):
     id: UUID4
     submenus_count: int
     dishes_count: int
+
+
+class OutAfterDelete(BaseModel):
+    status: bool
+    message: str

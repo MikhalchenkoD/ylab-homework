@@ -1,56 +1,38 @@
-from uuid import UUID, uuid4
-from typing import List, Sequence
+from uuid import UUID
+from typing import Sequence
 
-from fastapi import Depends, HTTPException, status, APIRouter
-from sqlalchemy import select
+from fastapi import Depends, status, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from services.dish_service import DishService
 from database.database import get_async_session
 from utils import schemas
-from database.models import Dish, Submenu
+from database.models import Dish
 
-dishes_router = APIRouter(prefix=f"/menus", tags=["Dish"])
+dishes_router = APIRouter(prefix='/menus', tags=['Dish'])
 
 
 @dishes_router.get(
-    "/{menu_id}/submenus/{submenu_id}/dishes",
-    response_model=List[schemas.DishOut],
+    '/{menu_id}/submenus/{submenu_id}/dishes',
+    response_model=list[schemas.DishOut],
 )
 async def get_list_dishes(
         menu_id: UUID, submenu_id: UUID, session: AsyncSession = Depends(get_async_session)
 ) -> Sequence[Dish]:
-    res = await session.execute(
-        select(Dish)
-        .join(Submenu)
-        .where(Submenu.menu_id == menu_id, Dish.submenu_id == submenu_id)
-    )
-    return res.scalars().all()
+    return await DishService(session).get(submenu_id)
 
 
 @dishes_router.get(
-    "/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
+    '/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
     response_model=schemas.DishOut,
 )
 async def get_dish_by_id(
         menu_id: UUID, submenu_id: UUID, dish_id: UUID, session: AsyncSession = Depends(get_async_session)
 ) -> Dish:
-    res = await session.execute(
-        select(Dish)
-        .join(Submenu)
-        .where(
-            Submenu.menu_id == menu_id,
-            Dish.submenu_id == submenu_id,
-            Dish.id == dish_id,
-        )
-    )
-    dish = res.scalars().one_or_none()
-    if not dish:
-        raise HTTPException(status_code=404, detail="dish not found")
-    return dish
+    return await DishService(session).get_by_id(dish_id)
 
 
 @dishes_router.post(
-    "/{menu_id}/submenus/{submenu_id}/dishes",
+    '/{menu_id}/submenus/{submenu_id}/dishes',
     response_model=schemas.DishOut,
     status_code=status.HTTP_201_CREATED,
 )
@@ -60,24 +42,11 @@ async def create_dish(
         submenu_id: UUID,
         session: AsyncSession = Depends(get_async_session),
 ) -> Dish:
-    res = await session.execute(
-        select(Submenu).where(Submenu.menu_id == menu_id, Submenu.id == submenu_id)
-    )
-    submenu = res.scalars().one_or_none()
-    new_dish = Dish(
-        id=uuid4(),
-        title=dish.title,
-        description=dish.description,
-        price=dish.price,
-        submenu_id=submenu.id,
-    )
-    session.add(new_dish)
-    await session.commit()
-    return new_dish
+    return await DishService(session).create(dish, submenu_id)
 
 
 @dishes_router.patch(
-    "/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
+    '/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
     response_model=schemas.DishOut,
 )
 async def update_dish_by_id(
@@ -87,43 +56,11 @@ async def update_dish_by_id(
         dish_id: UUID,
         session: AsyncSession = Depends(get_async_session),
 ) -> Dish:
-    res = await session.execute(
-        select(Dish)
-        .join(Submenu)
-        .where(
-            Submenu.menu_id == menu_id,
-            Dish.submenu_id == submenu_id,
-            Dish.id == dish_id,
-        )
-    )
-    result = res.scalars().one_or_none()
-    result.title = dish.title
-    result.description = dish.description
-    result.price = dish.price
-    await session.commit()
-
-    return result
+    return await DishService(session).update(dish, dish_id)
 
 
-@dishes_router.delete("/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}")
+@dishes_router.delete('/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', response_model=schemas.OutAfterDelete)
 async def delete_dish_by_id(
         menu_id: UUID, submenu_id: UUID, dish_id: UUID, session: AsyncSession = Depends(get_async_session)
-) -> dict:
-    res = await session.execute(
-        select(Dish)
-        .join(Submenu)
-        .where(
-            Submenu.menu_id == menu_id,
-            Dish.submenu_id == submenu_id,
-            Dish.id == dish_id,
-        )
-    )
-    result = res.scalars().one_or_none()
-
-    await session.delete(result)
-    await session.commit()
-
-    return {
-        "status": True,
-        "message": "The dish has been deleted"
-    }
+) -> schemas.OutAfterDelete:
+    return await DishService(session).delete(dish_id)

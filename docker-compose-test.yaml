@@ -14,6 +14,8 @@ services:
     depends_on:
         postgres_tests_ylab:
           condition: service_healthy
+        redis_ylab:
+          condition: service_healthy
 
   postgres_tests_ylab:
     container_name: postgres_tests_ylab
@@ -35,6 +37,20 @@ services:
       timeout: 30s
       retries: 5
       start_period: 80s
+
+  redis_ylab:
+    container_name: redis_ylab
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    networks:
+      - ylab_test_network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 
 
 networks:
