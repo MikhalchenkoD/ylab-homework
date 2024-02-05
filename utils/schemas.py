@@ -1,9 +1,4 @@
-from pydantic import (
-    BaseModel,
-    field_validator,
-    ValidationError,
-    UUID4,
-)
+from pydantic import UUID4, BaseModel, ValidationError, field_validator
 
 
 class DishIn(BaseModel):

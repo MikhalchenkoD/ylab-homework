@@ -21,7 +21,7 @@ class SubmenuService:
         created_submenu = await self.repository.create(submenu, menu_id)
         converted_submenu = await self.converter.convert_menu(created_submenu)
 
-        await self.redis.clear_all()
+        await self.redis.delete_parents_and_children_keys(menu_id)
 
         return converted_submenu
 
@@ -34,12 +34,12 @@ class SubmenuService:
         submenus = await self.repository.get(menu_id)
         converted_submenus = await self.converter.convert_list_submenus(submenus)
 
-        await self.redis.save('submenus_list', converted_submenus)
+        await self.redis.save('submenus_list', value=converted_submenus)
 
         return converted_submenus
 
-    async def get_by_id(self, submenu_id: uuid.UUID) -> SubmenuOut:
-        submenu_in_cache = await self.redis.get(submenu_id)
+    async def get_by_id(self, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> SubmenuOut:
+        submenu_in_cache = await self.redis.get(menu_id, submenu_id)
 
         if submenu_in_cache:
             return submenu_in_cache
@@ -51,21 +51,21 @@ class SubmenuService:
 
         converted_submenu = await self.converter.convert_menu(submenu)
 
-        await self.redis.save(submenu_id, converted_submenu)
+        await self.redis.save(menu_id, submenu_id, value=converted_submenu)
 
         return converted_submenu
 
-    async def update(self, submenu: schemas.SubmenuIn, submenu_id: uuid.UUID) -> SubmenuOut:
+    async def update(self, submenu: schemas.SubmenuIn, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> SubmenuOut:
         updated_submenu = await self.repository.update(submenu_id, submenu)
         converted_submenu = await self.converter.convert_menu(updated_submenu)
 
-        await self.redis.clear_all()
+        await self.redis.delete_parents_and_children_keys(menu_id)
 
         return converted_submenu
 
-    async def delete(self, submenu_id: uuid.UUID) -> schemas.OutAfterDelete:
+    async def delete(self, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> schemas.OutAfterDelete:
         await self.repository.delete(submenu_id)
 
-        await self.redis.clear_all()
+        await self.redis.delete_parents_and_children_keys(menu_id)
 
         return schemas.OutAfterDelete(status=True, message='The submenu has been deleted')

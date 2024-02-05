@@ -1,10 +1,10 @@
 import uuid
 from typing import Any, Sequence
 
-from sqlalchemy import select, func, Row
+from sqlalchemy import Row, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.models import Submenu, Dish
+from database.models import Dish, Submenu
 from utils import schemas
 
 

@@ -1,8 +1,9 @@
 from httpx import AsyncClient
 from sqlalchemy import select
 
-from .conftest import TestingSessionLocal, reverse
 from database.models import Menu
+
+from .conftest import TestingSessionLocal, reverse
 
 
 async def test_get_empty_list_menus(ac: AsyncClient):

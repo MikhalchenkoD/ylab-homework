@@ -1,11 +1,13 @@
-from typing import AsyncGenerator, Any
+from typing import Any, AsyncGenerator
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
-from database.models import Base
+
 from database.database import get_async_session
+from database.models import Base
 from main import app
 
 DATABASE_URL_TEST = 'postgresql+asyncpg://postgres:admin@postgres_tests_ylab/ylabtest'

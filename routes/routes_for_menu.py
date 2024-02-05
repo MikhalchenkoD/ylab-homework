@@ -1,11 +1,11 @@
 import uuid
 
-from fastapi import Depends, APIRouter
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from utils import schemas
+
 from database.database import get_async_session
-from fastapi import status
 from services.menu_service import MenuService
+from utils import schemas
 
 menus_router = APIRouter(prefix='/menus', tags=['Menu'])
 

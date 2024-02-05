@@ -1,9 +1,10 @@
 import uuid
 
-from fastapi import Depends, status, APIRouter
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from services.submenu_service import SubmenuService
+
 from database.database import get_async_session
+from services.submenu_service import SubmenuService
 from utils import schemas
 
 submenus_router = APIRouter(prefix='/menus', tags=['Submenu'])
@@ -25,7 +26,7 @@ async def get_list_submenus(
 async def get_submenu_by_id(
         menu_id: uuid.UUID, submenu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
 ) -> schemas.SubmenuOut:
-    return await SubmenuService(session).get_by_id(submenu_id)
+    return await SubmenuService(session).get_by_id(menu_id, submenu_id)
 
 
 @submenus_router.post(
@@ -51,11 +52,11 @@ async def update_submenu_by_id(
         submenu_id: uuid.UUID,
         session: AsyncSession = Depends(get_async_session),
 ) -> schemas.SubmenuOut:
-    return await SubmenuService(session).update(submenu, submenu_id)
+    return await SubmenuService(session).update(submenu, menu_id, submenu_id)
 
 
 @submenus_router.delete('/{menu_id}/submenus/{submenu_id}', response_model=schemas.OutAfterDelete)
 async def delete_submenu_by_id(
         menu_id: uuid.UUID, submenu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
 ) -> schemas.OutAfterDelete:
-    return await SubmenuService(session).delete(submenu_id)
+    return await SubmenuService(session).delete(menu_id, submenu_id)

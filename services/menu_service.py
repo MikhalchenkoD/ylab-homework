@@ -20,7 +20,7 @@ class MenuService:
         created_menu = await self.repository.create(menu)
         converted_menu = await self.converter.convert_menu(created_menu)
 
-        await self.redis.clear_all()
+        await self.redis.delete('menus_list')
 
         return converted_menu
 
@@ -33,7 +33,7 @@ class MenuService:
         menus = await self.repository.get()
         converted_menus = await self.converter.convert_list_menus(menus)
 
-        await self.redis.save('menus_list', converted_menus)
+        await self.redis.save('menus_list', value=converted_menus)
 
         return converted_menus
 
@@ -50,7 +50,7 @@ class MenuService:
 
         converted_menu = await self.converter.convert_menu(menu)
 
-        await self.redis.save(menu_id, converted_menu)
+        await self.redis.save(menu_id, value=converted_menu)
 
         return converted_menu
 
@@ -58,13 +58,13 @@ class MenuService:
         updated_menu = await self.repository.update(menu_id, menu)
         converted_menu = await self.converter.convert_menu(updated_menu)
 
-        await self.redis.clear_all()
+        await self.redis.delete_parents_and_children_keys(menu_id)
 
         return converted_menu
 
     async def delete(self, menu_id: uuid.UUID) -> schemas.OutAfterDelete:
         await self.repository.delete(menu_id)
 
-        await self.redis.clear_all()
+        await self.redis.delete_parents_and_children_keys(menu_id)
 
         return schemas.OutAfterDelete(status=True, message='The menu has been deleted')

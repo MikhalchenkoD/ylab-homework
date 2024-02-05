@@ -1,20 +1,24 @@
+import pickle
 from typing import Any
 
 import aioredis
-import pickle
+
+from converters.redis_converter import RedisConverter
 
 
 class RedisRepository:
     def __init__(self):
         self.redis = aioredis.from_url('redis://redis_ylab')
+        self.converter = RedisConverter()
 
-    async def save(self, key: Any, value: Any) -> None:
-        key = pickle.dumps(key)
+    async def save(self, *keys: Any, value: Any) -> None:
+        key = await self.converter.generate_key(*keys)
+
         value = pickle.dumps(value)
         await self.redis.set(key, value, ex=60)
 
-    async def get(self, key: Any) -> Any | None:
-        key = pickle.dumps(key)
+    async def get(self, *keys: Any) -> Any | None:
+        key = await self.converter.generate_key(*keys)
         value = await self.redis.get(key)
 
         if not value:
@@ -23,13 +27,23 @@ class RedisRepository:
         value = pickle.loads(value)
         return value
 
-    async def delete(self, key: Any) -> None:
-        key = pickle.dumps(key)
-        await self.redis.delete(key)
+    async def delete_parents_and_children_keys(self, key: Any) -> None:
+        keys = await self.get_all_parents_and_children_keys(key)
 
-    async def update(self, key: Any, value: Any) -> None:
-        await self.delete(key)
-        await self.save(key, value)
+        for key in keys:
+            await self.redis.delete(key)
 
-    async def clear_all(self) -> None:
-        await self.redis.flushdb()
+    async def delete(self, *keys: Any) -> None:
+        for key in keys:
+            await self.redis.delete(str(key))
+
+    async def get_all_parents_and_children_keys(self, key) -> list[str]:
+        keys = ['menus_list', 'submenus_list', 'dishes_list']
+        matching_keys = []
+        cursor = b'0'
+
+        while cursor:
+            cursor, keys_batch = await self.redis.scan(cursor, match=f'{key}*')
+            matching_keys.extend(keys_batch)
+
+        return matching_keys + keys

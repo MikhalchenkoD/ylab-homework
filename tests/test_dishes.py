@@ -1,8 +1,8 @@
+from httpx import AsyncClient
 from sqlalchemy import select
 
-from httpx import AsyncClient
-
 from database.models import Dish, Menu, Submenu
+
 from .conftest import TestingSessionLocal, reverse
 
 

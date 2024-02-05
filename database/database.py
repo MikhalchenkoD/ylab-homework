@@ -1,6 +1,6 @@
 from typing import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 engine = create_async_engine('postgresql+asyncpg://postgres:admin@postgres_ylab/ylab')

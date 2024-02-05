@@ -16,10 +16,10 @@ class DishService:
         self.repository = DishRepository(self.session)
         self.redis = RedisRepository()
 
-    async def create(self, dish: schemas.DishIn, submenu_id: uuid.UUID) -> Dish:
+    async def create(self, dish: schemas.DishIn, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> Dish:
         created_dish = await self.repository.create(dish, submenu_id)
 
-        await self.redis.clear_all()
+        await self.redis.delete_parents_and_children_keys(menu_id)
 
         return created_dish
 
@@ -31,12 +31,12 @@ class DishService:
 
         dishes = await self.repository.get(submenu_id)
 
-        await self.redis.save('dishes_list', dishes)
+        await self.redis.save('dishes_list', value=dishes)
 
         return dishes
 
-    async def get_by_id(self, dish_id: uuid.UUID) -> Dish:
-        dish_in_cache = await self.redis.get('dish_id')
+    async def get_by_id(self, menu_id: uuid.UUID, submenu_id: uuid.UUID, dish_id: uuid.UUID) -> Dish:
+        dish_in_cache = await self.redis.get(menu_id, submenu_id, dish_id)
 
         if dish_in_cache:
             return dish_in_cache
@@ -46,20 +46,20 @@ class DishService:
         if not dish:
             raise HTTPException(status_code=404, detail='dish not found')
 
-        await self.redis.save(dish_id, dish)
+        await self.redis.save(menu_id, submenu_id, dish_id, value=dish)
 
         return dish
 
-    async def update(self, dish: schemas.DishIn, dish_id: uuid.UUID) -> Dish:
+    async def update(self, dish: schemas.DishIn, menu_id: uuid.UUID, dish_id: uuid.UUID) -> Dish:
         updated_dish = await self.repository.update(dish_id, dish)
 
-        await self.redis.clear_all()
+        await self.redis.delete_parents_and_children_keys(menu_id)
 
         return updated_dish
 
-    async def delete(self, dish_id: uuid.UUID) -> schemas.OutAfterDelete:
+    async def delete(self, menu_id: uuid.UUID, dish_id: uuid.UUID) -> schemas.OutAfterDelete:
         await self.repository.delete(dish_id)
 
-        await self.redis.clear_all()
+        await self.redis.delete_parents_and_children_keys(menu_id)
 
         return schemas.OutAfterDelete(status=True, message='The dish has been deleted')
