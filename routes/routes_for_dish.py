@@ -25,6 +25,7 @@ async def get_list_dishes(
 @dishes_router.get(
     '/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
     response_model=schemas.DishOut,
+    responses={404: {'model': schemas.NotFoundError}}
 )
 async def get_dish_by_id(
         menu_id: UUID, submenu_id: UUID, dish_id: UUID, session: AsyncSession = Depends(get_async_session)

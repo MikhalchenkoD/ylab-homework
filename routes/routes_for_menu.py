@@ -15,7 +15,7 @@ async def get_list_menus(session: AsyncSession = Depends(get_async_session)) -> 
     return await MenuService(session).get()
 
 
-@menus_router.get('/{menu_id}', response_model=schemas.MenuOut)
+@menus_router.get('/{menu_id}', response_model=schemas.MenuOut, responses={404: {'model': schemas.NotFoundError}})
 async def get_menu_by_id(menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)) -> schemas.MenuOut:
     return await MenuService(session).get_by_id(menu_id)
 
@@ -28,6 +28,7 @@ async def get_menu_by_id(menu_id: uuid.UUID, session: AsyncSession = Depends(get
 async def create_menu(
         menu: schemas.MenuIn, session: AsyncSession = Depends(get_async_session)
 ) -> schemas.MenuOut:
+
     return await MenuService(session).create(menu)
 
 

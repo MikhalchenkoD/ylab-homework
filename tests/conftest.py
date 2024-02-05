@@ -15,7 +15,7 @@ engine_test = create_async_engine(DATABASE_URL_TEST, poolclass=NullPool)
 TestingSessionLocal = sessionmaker(engine_test, class_=AsyncSession, expire_on_commit=False)
 
 
-async def override_get_async_session():
+async def override_get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with TestingSessionLocal() as session:
         yield session
 
@@ -23,15 +23,18 @@ async def override_get_async_session():
 app.dependency_overrides[get_async_session] = override_get_async_session
 
 
-async def reverse(route_name: str, **path_params):
+async def reverse(route_name: str, **path_params: Any) -> str:
+    url = ''
+
     for route in app.routes:
         if route.name == route_name:
             url = route.path.format(**path_params)
-            return url
+
+    return url
 
 
 @pytest.fixture(autouse=True, scope='session')
-async def prepare_database(request):
+async def prepare_database(request: pytest.FixtureRequest) -> AsyncGenerator[None, None]:
     async with engine_test.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield

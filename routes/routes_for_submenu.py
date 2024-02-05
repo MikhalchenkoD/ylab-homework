@@ -22,6 +22,7 @@ async def get_list_submenus(
 @submenus_router.get(
     '/{menu_id}/submenus/{submenu_id}',
     response_model=schemas.SubmenuOut,
+    responses={404: {'model': schemas.NotFoundError}}
 )
 async def get_submenu_by_id(
         menu_id: uuid.UUID, submenu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)

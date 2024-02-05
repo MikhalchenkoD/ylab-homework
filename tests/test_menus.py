@@ -1,3 +1,5 @@
+from typing import Any
+
 from httpx import AsyncClient
 from sqlalchemy import select
 
@@ -6,7 +8,7 @@ from database.models import Menu
 from .conftest import TestingSessionLocal, reverse
 
 
-async def test_get_empty_list_menus(ac: AsyncClient):
+async def test_get_empty_list_menus(ac: AsyncClient) -> None:
     url = await reverse('get_list_menus')
     response = await ac.get(url)
 
@@ -14,7 +16,7 @@ async def test_get_empty_list_menus(ac: AsyncClient):
     assert len(response.json()) == 0
 
 
-async def test_create_menu(ac: AsyncClient, buffer_data):
+async def test_create_menu(ac: AsyncClient, buffer_data: dict[str, Any]) -> None:
     data = {
         'title': 'My menu 1',
         'description': 'My menu description 1'
@@ -39,7 +41,7 @@ async def test_create_menu(ac: AsyncClient, buffer_data):
         assert menu.description == data['description']
 
 
-async def test_get_list_menus(ac: AsyncClient):
+async def test_get_list_menus(ac: AsyncClient) -> None:
     url = await reverse('get_list_menus')
     response = await ac.get(url)
 
@@ -47,7 +49,7 @@ async def test_get_list_menus(ac: AsyncClient):
     assert response.status_code == 200
 
 
-async def test_get_menu_by_id(ac: AsyncClient, buffer_data):
+async def test_get_menu_by_id(ac: AsyncClient, buffer_data: dict[str, Any]) -> None:
     url = await reverse('get_menu_by_id', menu_id=buffer_data['menu']['id'])
     response = await ac.get(url)
     json_response = response.json()
@@ -58,7 +60,7 @@ async def test_get_menu_by_id(ac: AsyncClient, buffer_data):
     assert json_response['description'] == buffer_data['menu']['description']
 
 
-async def test_update_menu(ac: AsyncClient, buffer_data):
+async def test_update_menu(ac: AsyncClient, buffer_data: dict[str, Any]) -> None:
     data = {
         'title': 'My updated menu 1',
         'description': 'My updated menu description 1'
@@ -82,7 +84,7 @@ async def test_update_menu(ac: AsyncClient, buffer_data):
         assert updated_menu.description == data['description']
 
 
-async def test_get_menu_by_id_after_update(ac: AsyncClient, buffer_data):
+async def test_get_menu_by_id_after_update(ac: AsyncClient, buffer_data: dict[str, Any]) -> None:
     url = await reverse('get_menu_by_id', menu_id=buffer_data['menu']['id'])
     response = await ac.get(url)
     json_response = response.json()
@@ -93,7 +95,7 @@ async def test_get_menu_by_id_after_update(ac: AsyncClient, buffer_data):
     assert json_response['description'] == buffer_data['menu']['description']
 
 
-async def test_delete_menu(ac: AsyncClient, buffer_data):
+async def test_delete_menu(ac: AsyncClient, buffer_data: dict[str, Any]) -> None:
     url = await reverse('delete_menu_by_id', menu_id=buffer_data['menu']['id'])
     response = await ac.delete(url)
 
@@ -106,7 +108,7 @@ async def test_delete_menu(ac: AsyncClient, buffer_data):
         assert deleted_menu is None
 
 
-async def test_get_list_menus_after_delete(ac: AsyncClient):
+async def test_get_list_menus_after_delete(ac: AsyncClient) -> None:
     url = await reverse('get_list_menus')
     response = await ac.get(url)
 
@@ -114,7 +116,7 @@ async def test_get_list_menus_after_delete(ac: AsyncClient):
     assert len(response.json()) == 0
 
 
-async def test_get_menu_by_id_after_delete(ac: AsyncClient, buffer_data):
+async def test_get_menu_by_id_after_delete(ac: AsyncClient, buffer_data: dict[str, Any]) -> None:
     url = await reverse('get_menu_by_id', menu_id=buffer_data['menu']['id'])
     response = await ac.get(url)
 

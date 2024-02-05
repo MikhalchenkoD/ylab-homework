@@ -1,1 +1,1 @@
-BASE_API_URL = "/api/v1"
+BASE_API_URL = '/api/v1'

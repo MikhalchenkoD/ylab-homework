@@ -44,3 +44,7 @@ class MenuOut(MenuIn):
 class OutAfterDelete(BaseModel):
     status: bool
     message: str
+
+
+class NotFoundError(BaseModel):
+    detail: str
