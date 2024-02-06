@@ -32,14 +32,14 @@ async def create_menu(
     return await MenuService(session).create(menu)
 
 
-@menus_router.patch('/{menu_id}', response_model=schemas.MenuOut)
+@menus_router.patch('/{menu_id}', response_model=schemas.MenuOut, responses={404: {'model': schemas.NotFoundError}})
 async def update_menu_by_id(
         menu: schemas.MenuIn, menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
 ) -> schemas.MenuOut:
     return await MenuService(session).update(menu, menu_id)
 
 
-@menus_router.delete('/{menu_id}', response_model=schemas.OutAfterDelete)
+@menus_router.delete('/{menu_id}', response_model=schemas.OutAfterDelete, responses={404: {'model': schemas.NotFoundError}})
 async def delete_menu_by_id(
         menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
 ) -> schemas.OutAfterDelete:

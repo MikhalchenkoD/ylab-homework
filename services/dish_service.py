@@ -53,12 +53,18 @@ class DishService:
     async def update(self, dish: schemas.DishIn, menu_id: uuid.UUID, dish_id: uuid.UUID) -> Dish:
         updated_dish = await self.repository.update(dish_id, dish)
 
+        if not updated_dish:
+            raise HTTPException(status_code=404, detail='dish not found')
+
         await self.redis.delete_parents_and_children_keys(menu_id)
 
         return updated_dish
 
     async def delete(self, menu_id: uuid.UUID, dish_id: uuid.UUID) -> schemas.OutAfterDelete:
-        await self.repository.delete(dish_id)
+        is_deleted = await self.repository.delete(dish_id)
+
+        if not is_deleted:
+            raise HTTPException(status_code=404, detail='dish not found')
 
         await self.redis.delete_parents_and_children_keys(menu_id)
 

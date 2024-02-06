@@ -56,6 +56,10 @@ class MenuService:
 
     async def update(self, menu: schemas.MenuIn, menu_id: uuid.UUID) -> schemas.MenuOut:
         updated_menu = await self.repository.update(menu_id, menu)
+
+        if not updated_menu:
+            raise HTTPException(status_code=404, detail='menu not found')
+
         converted_menu = await self.converter.convert_menu(updated_menu)
 
         await self.redis.delete_parents_and_children_keys(menu_id)
@@ -63,7 +67,10 @@ class MenuService:
         return converted_menu
 
     async def delete(self, menu_id: uuid.UUID) -> schemas.OutAfterDelete:
-        await self.repository.delete(menu_id)
+        is_deleted = await self.repository.delete(menu_id)
+
+        if not is_deleted:
+            raise HTTPException(status_code=404, detail='menu not found')
 
         await self.redis.delete_parents_and_children_keys(menu_id)
 

@@ -57,6 +57,10 @@ class SubmenuService:
 
     async def update(self, submenu: schemas.SubmenuIn, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> SubmenuOut:
         updated_submenu = await self.repository.update(submenu_id, submenu)
+
+        if not updated_submenu:
+            raise HTTPException(status_code=404, detail='submenu not found')
+
         converted_submenu = await self.converter.convert_menu(updated_submenu)
 
         await self.redis.delete_parents_and_children_keys(menu_id)
@@ -64,7 +68,10 @@ class SubmenuService:
         return converted_submenu
 
     async def delete(self, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> schemas.OutAfterDelete:
-        await self.repository.delete(submenu_id)
+        is_deleted = await self.repository.delete(submenu_id)
+
+        if not is_deleted:
+            raise HTTPException(status_code=404, detail='submenu not found')
 
         await self.redis.delete_parents_and_children_keys(menu_id)
 

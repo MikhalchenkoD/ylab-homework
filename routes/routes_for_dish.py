@@ -50,6 +50,7 @@ async def create_dish(
 @dishes_router.patch(
     '/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
     response_model=schemas.DishOut,
+    responses={404: {'model': schemas.NotFoundError}}
 )
 async def update_dish_by_id(
         dish: schemas.DishIn,
@@ -61,7 +62,7 @@ async def update_dish_by_id(
     return await DishService(session).update(dish, menu_id, dish_id)
 
 
-@dishes_router.delete('/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', response_model=schemas.OutAfterDelete)
+@dishes_router.delete('/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', response_model=schemas.OutAfterDelete, responses={404: {'model': schemas.NotFoundError}})
 async def delete_dish_by_id(
         menu_id: UUID, submenu_id: UUID, dish_id: UUID, session: AsyncSession = Depends(get_async_session)
 ) -> schemas.OutAfterDelete:

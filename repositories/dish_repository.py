@@ -3,6 +3,7 @@ from typing import Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.exc import UnmappedInstanceError
 
 from database.models import Dish
 from utils import schemas
@@ -25,8 +26,12 @@ class DishRepository:
 
         return dish_obj
 
-    async def update(self, dish_id: uuid.UUID, dish: schemas.DishIn) -> Dish:
+    async def update(self, dish_id: uuid.UUID, dish: schemas.DishIn) -> Dish | None:
         dish_obj = await self.get_by_id(dish_id)
+
+        if not dish_obj:
+            return None
+
         dish_obj.title = dish.title
         dish_obj.description = dish.description
         dish_obj.price = dish.price
@@ -35,11 +40,14 @@ class DishRepository:
         return dish_obj
 
     async def delete(self, dish_id: uuid.UUID) -> bool:
-        dish = await self.get_by_id(dish_id)
-        await self.session.delete(dish)
-        await self.session.commit()
+        try:
+            dish = await self.get_by_id(dish_id)
+            await self.session.delete(dish)
+            await self.session.commit()
 
-        return True
+            return True
+        except UnmappedInstanceError:
+            return False
 
     async def get(self, submenu_id: uuid.UUID) -> Sequence[Dish]:
         res = await self.session.execute(

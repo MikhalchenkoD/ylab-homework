@@ -46,6 +46,7 @@ async def create_submenu(
 @submenus_router.patch(
     '/{menu_id}/submenus/{submenu_id}',
     response_model=schemas.SubmenuOut,
+    responses={404: {'model': schemas.NotFoundError}}
 )
 async def update_submenu_by_id(
         submenu: schemas.SubmenuIn,
@@ -56,7 +57,7 @@ async def update_submenu_by_id(
     return await SubmenuService(session).update(submenu, menu_id, submenu_id)
 
 
-@submenus_router.delete('/{menu_id}/submenus/{submenu_id}', response_model=schemas.OutAfterDelete)
+@submenus_router.delete('/{menu_id}/submenus/{submenu_id}', response_model=schemas.OutAfterDelete, responses={404: {'model': schemas.NotFoundError}})
 async def delete_submenu_by_id(
         menu_id: uuid.UUID, submenu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)
 ) -> schemas.OutAfterDelete:
