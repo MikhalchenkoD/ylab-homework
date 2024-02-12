@@ -3,6 +3,7 @@ from typing import Any, Sequence
 
 from sqlalchemy import Row, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
 from database.models import Dish, Menu, Submenu
@@ -64,6 +65,14 @@ class MenuRepository:
 
         return res.scalars().one_or_none()
 
+    async def get_by_title(self, title: str) -> Menu:
+        res = await self.session.execute(
+            select(Menu)
+            .where(Menu.title == title)
+        )
+
+        return res.scalars().one_or_none()
+
     async def get_by_id_with_counts(self, menu_id: uuid.UUID) -> Row[Any]:
         res = await self.session.execute(
             select(
@@ -78,3 +87,15 @@ class MenuRepository:
         )
 
         return res.fetchone()
+
+    async def get_menus_list_with_submenus_and_dishes(self) -> Sequence[Row[Any]]:
+        res = await self.session.execute(
+            select(Menu)
+            .options(
+                joinedload(Menu.submenus)
+                .joinedload(Submenu.dishes)
+            )
+            .order_by(Menu.id)
+        )
+
+        return res.unique().all()

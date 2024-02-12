@@ -68,6 +68,14 @@ class SubmenuRepository:
 
         return res.scalars().one_or_none()
 
+    async def get_by_title(self, title: str) -> Submenu:
+        res = await self.session.execute(
+            select(Submenu)
+            .where(Submenu.title == title)
+        )
+
+        return res.scalars().one_or_none()
+
     async def get_by_id_with_counts(self, submenu_id: uuid.UUID) -> Row[Any]:
         res = await self.session.execute(
             select(

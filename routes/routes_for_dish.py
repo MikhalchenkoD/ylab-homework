@@ -1,7 +1,7 @@
 from typing import Sequence
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.database import get_async_session
@@ -39,12 +39,13 @@ async def get_dish_by_id(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_dish(
+        background_tasks: BackgroundTasks,
         dish: schemas.DishIn,
         menu_id: UUID,
         submenu_id: UUID,
         session: AsyncSession = Depends(get_async_session),
 ) -> Dish:
-    return await DishService(session).create(dish, menu_id, submenu_id)
+    return await DishService(session).create(background_tasks, dish, menu_id, submenu_id)
 
 
 @dishes_router.patch(
@@ -54,16 +55,17 @@ async def create_dish(
 )
 async def update_dish_by_id(
         dish: schemas.DishIn,
+        background_tasks: BackgroundTasks,
         menu_id: UUID,
         submenu_id: UUID,
         dish_id: UUID,
         session: AsyncSession = Depends(get_async_session),
 ) -> Dish:
-    return await DishService(session).update(dish, menu_id, dish_id)
+    return await DishService(session).update(background_tasks, dish, menu_id, dish_id)
 
 
 @dishes_router.delete('/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', response_model=schemas.OutAfterDelete, responses={404: {'model': schemas.NotFoundError}})
 async def delete_dish_by_id(
-        menu_id: UUID, submenu_id: UUID, dish_id: UUID, session: AsyncSession = Depends(get_async_session)
+        menu_id: UUID, background_tasks: BackgroundTasks, submenu_id: UUID, dish_id: UUID, session: AsyncSession = Depends(get_async_session)
 ) -> schemas.OutAfterDelete:
-    return await DishService(session).delete(menu_id, dish_id)
+    return await DishService(session).delete(background_tasks, menu_id, dish_id)

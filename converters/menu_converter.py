@@ -30,3 +30,29 @@ class MenuConverter:
             dishes_count=dishes_count
         )
         return menu_out
+
+    async def convert_menu_with_submenus_and_dishes(
+            self, menus: Sequence[Row[Any]]
+    ) -> list[schemas.MenuOutWithSubmenusAndDishes]:
+        menus_result = []
+
+        for menu_row in menus:
+            menu = menu_row[0]
+            menu_out = schemas.MenuOutWithSubmenusAndDishes(
+                id=menu.id,
+                title=menu.title,
+                description=menu.description,
+                submenus=[],
+                dishes=[]
+            )
+
+            for submenu in menu.submenus:
+
+                for dish in submenu.dishes:
+                    menu_out.dishes.append(dish)
+
+                menu_out.submenus.append(submenu)
+
+            menus_result.append(menu_out)
+
+        return menus_result

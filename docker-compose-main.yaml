@@ -53,6 +53,41 @@ services:
       timeout: 5s
       retries: 3
 
+  rabbitmq_ylab:
+    container_name: rabbitmq_ylab
+    image: "rabbitmq:3.13-rc"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    ports:
+      - "5672:5672"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - ylab_network
+
+
+
+  celery_ylab:
+    container_name: celery_ylab
+    build:
+      context: .
+      dockerfile: Dockerfile-celery
+    entrypoint: sh -c "celery -A celery_conf.celery_app worker --loglevel=info & celery -A celery_conf.celery_app beat --loglevel=info"
+    networks:
+      - ylab_network
+    depends_on:
+        postgres_ylab:
+          condition: service_healthy
+        redis_ylab:
+          condition: service_healthy
+        rabbitmq_ylab:
+          condition: service_healthy
+
+
 networks:
   ylab_network:
     name: ylab_network

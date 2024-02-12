@@ -38,7 +38,7 @@ class RedisRepository:
             await self.redis.delete(str(key))
 
     async def get_all_parents_and_children_keys(self, key: Any) -> list[str]:
-        keys = ['menus_list', 'submenus_list', 'dishes_list']
+        keys = ['menus_list', 'submenus_list', 'dishes_list', 'menus_list_with_submenus_and_dishes']
         matching_keys = []
         cursor = b'0'
 

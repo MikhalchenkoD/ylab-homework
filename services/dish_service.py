@@ -1,7 +1,7 @@
 import uuid
 from typing import Sequence
 
-from fastapi import HTTPException
+from fastapi import BackgroundTasks, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import Dish
@@ -16,10 +16,10 @@ class DishService:
         self.repository = DishRepository(self.session)
         self.redis = RedisRepository()
 
-    async def create(self, dish: schemas.DishIn, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> Dish:
+    async def create(self, background_tasks: BackgroundTasks, dish: schemas.DishIn, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> Dish:
         created_dish = await self.repository.create(dish, submenu_id)
 
-        await self.redis.delete_parents_and_children_keys(menu_id)
+        background_tasks.add_task(self.redis.delete_parents_and_children_keys, menu_id)
 
         return created_dish
 
@@ -50,22 +50,22 @@ class DishService:
 
         return dish
 
-    async def update(self, dish: schemas.DishIn, menu_id: uuid.UUID, dish_id: uuid.UUID) -> Dish:
+    async def update(self, background_tasks: BackgroundTasks, dish: schemas.DishIn, menu_id: uuid.UUID, dish_id: uuid.UUID) -> Dish:
         updated_dish = await self.repository.update(dish_id, dish)
 
         if not updated_dish:
             raise HTTPException(status_code=404, detail='dish not found')
 
-        await self.redis.delete_parents_and_children_keys(menu_id)
+        background_tasks.add_task(self.redis.delete_parents_and_children_keys, menu_id)
 
         return updated_dish
 
-    async def delete(self, menu_id: uuid.UUID, dish_id: uuid.UUID) -> schemas.OutAfterDelete:
+    async def delete(self, background_tasks: BackgroundTasks, menu_id: uuid.UUID, dish_id: uuid.UUID) -> schemas.OutAfterDelete:
         is_deleted = await self.repository.delete(dish_id)
 
         if not is_deleted:
             raise HTTPException(status_code=404, detail='dish not found')
 
-        await self.redis.delete_parents_and_children_keys(menu_id)
+        background_tasks.add_task(self.redis.delete_parents_and_children_keys, menu_id)
 
         return schemas.OutAfterDelete(status=True, message='The dish has been deleted')

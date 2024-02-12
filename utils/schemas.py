@@ -25,8 +25,11 @@ class SubmenuIn(BaseModel):
     description: str
 
 
-class SubmenuOut(SubmenuIn):
+class Submenu(SubmenuIn):
     id: UUID4
+
+
+class SubmenuOut(Submenu):
     dishes_count: int
 
 
@@ -35,10 +38,18 @@ class MenuIn(BaseModel):
     description: str
 
 
-class MenuOut(MenuIn):
+class Menu(MenuIn):
     id: UUID4
+
+
+class MenuOut(Menu):
     submenus_count: int
     dishes_count: int
+
+
+class MenuOutWithSubmenusAndDishes(Menu):
+    submenus: list[SubmenuOut]
+    dishes: list[DishOut]
 
 
 class OutAfterDelete(BaseModel):

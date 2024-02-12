@@ -62,3 +62,11 @@ class DishRepository:
             .where(Dish.id == dish_id)
         )
         return res.scalars().one_or_none()
+
+    async def get_by_title(self, title: str) -> Dish:
+        res = await self.session.execute(
+            select(Dish)
+            .where(Dish.title == title)
+        )
+
+        return res.scalars().one_or_none()

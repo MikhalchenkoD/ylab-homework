@@ -1,7 +1,7 @@
 # Y_LAB Homework
 
 Проект на FastAPI с использованием PostgreSQL в качестве БД. В проекте реализовано REST API по работе с меню ресторана, все CRUD операции.
-Пункт №6 задания находится в tests/coftest.py, строка 24
+Пункт №5 задания находится в repositoires/google_sheets_repository.py, parsers/google_sheets_parser.py, services/task_service.py, celery_conf.py
 ### Зависимости:
 ```
 У меню есть подменю, которые к ней привязаны.

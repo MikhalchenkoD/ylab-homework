@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import HTTPException
+from fastapi import BackgroundTasks, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from converters.submenu_converter import SubmenuConverter
@@ -17,11 +17,11 @@ class SubmenuService:
         self.repository = SubmenuRepository(self.session)
         self.redis = RedisRepository()
 
-    async def create(self, submenu: schemas.SubmenuIn, menu_id: uuid.UUID) -> schemas.SubmenuOut:
+    async def create(self, background_tasks: BackgroundTasks, submenu: schemas.SubmenuIn, menu_id: uuid.UUID) -> schemas.SubmenuOut:
         created_submenu = await self.repository.create(submenu, menu_id)
         converted_submenu = await self.converter.convert_menu(created_submenu)
 
-        await self.redis.delete_parents_and_children_keys(menu_id)
+        background_tasks.add_task(self.redis.delete_parents_and_children_keys, menu_id)
 
         return converted_submenu
 
@@ -55,7 +55,7 @@ class SubmenuService:
 
         return converted_submenu
 
-    async def update(self, submenu: schemas.SubmenuIn, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> SubmenuOut:
+    async def update(self, background_tasks: BackgroundTasks, submenu: schemas.SubmenuIn, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> SubmenuOut:
         updated_submenu = await self.repository.update(submenu_id, submenu)
 
         if not updated_submenu:
@@ -63,16 +63,16 @@ class SubmenuService:
 
         converted_submenu = await self.converter.convert_menu(updated_submenu)
 
-        await self.redis.delete_parents_and_children_keys(menu_id)
+        background_tasks.add_task(self.redis.delete_parents_and_children_keys, menu_id)
 
         return converted_submenu
 
-    async def delete(self, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> schemas.OutAfterDelete:
+    async def delete(self, background_tasks: BackgroundTasks, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> schemas.OutAfterDelete:
         is_deleted = await self.repository.delete(submenu_id)
 
         if not is_deleted:
             raise HTTPException(status_code=404, detail='submenu not found')
 
-        await self.redis.delete_parents_and_children_keys(menu_id)
+        background_tasks.add_task(self.redis.delete_parents_and_children_keys, menu_id)
 
         return schemas.OutAfterDelete(status=True, message='The submenu has been deleted')

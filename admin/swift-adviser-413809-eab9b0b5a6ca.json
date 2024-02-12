@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "swift-adviser-413809",
+  "private_key_id": "eab9b0b5a6ca69a4b64684565b5cddd855861361",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCa4cIrUow1vOpU\nE7bxzWPTSBumr5yozlYKaMcXN7018oLMHs4rpqYrTgjNOrY4knwrkGy+yRHL9mkb\nWlfJ/eLfhgEhKsR+SHaUHpak9+ZWtNDvl8D4sfyHb7t88nzroEDIn5thAP/KW9OE\nMVA9ZDR6CTmVrb6hr1TbRlVIW0CBfWYtE7Nh3kXCoDnm4EuAiVoDlsTsTEphIGnd\nd97vA//CvZgz4lLfM5/JUd85HRyxJ3Mjt5XzKIFRaw+T3CW0hG7L4BcMc8jxwOJ9\nNl78Qd+i7XW8d93bZQ9Xn+N9vzZywSVW4LYBsTmSdw3jGvDbDTTtqFnHJpGpiYzW\n2sMOEfZJAgMBAAECggEACQKOHaAROQUS6q40688jegSNWz6HEgji13st7ctXzf4c\nHszB+KcarpU9DNdYB2V6JLyjntuqld9xUN6KEd2bp54vjaLjyGblwwsef11OgIfH\nSdDdsHoGM0jMMuIWY0ywyBsE2nlI6Bg8b0nBHbkpFlpYB72SQ+yjtpfaWTm5wG6Y\nVGCwZQxm/Qj8/2L8diGTPt4weJqZtEUdkpgWKEl9Efjnc281VJv7rrEZo+x2eNNg\nbJADF/fHKBczs3Wo7/fRAxBqFxClo6ALun6DRVV8BgthNhe5ZMEMF1RIEt3EFEfB\n+q+BjlWlDWEiWGNMOMEdooJl34uzUZR/c/9jT/QkUwKBgQDZJ3x0TCTRLLw493pG\n2TcrwqbE3/EeuIQLMsCp7tok5XaMr1Aq68kB5EsDK+WoWKKZL6ykYXd6GO941Fdn\nGE6agNs44nW+A2vm2D1sHzr2G6r5qub4tbK4vhR0cKz9rMAGXTzjNw9mTofKDQXC\n9FfKpFhfFImWcVYNv6oSbI8EYwKBgQC2locLqt9sxFu5u8v1VglVeL3RdjWdR+4z\nG4vhRrEzTODimi6GX15gV5hYkzx2xvygNeKcbWgqLgRqfK63/NGLtu4YLk607ibU\nMUtr8NGBg87fe37d7itqaqaRYxkTESdG5e7gzXBYWaTzfiS3cw7UXv+2WGVCCpYz\ne5YhC+jsYwKBgC9eha94zK80avqiQXIi//3zwB1CHH7vER7AO3bWO4/A3lNiCsLS\nHE7lVdejQ72tWArCc46IFF/2AIcDCu3aR4s8gJWwEK8aX/dDRGLJjTsSXgGIXkny\nmMHj9OJRkerkPB8nR5jo8dsHVmek35TfaCc0InLbMAg5QORO4vKR68CxAoGBAK1Y\nw+Wj2HLfCWaQkNbfVAU9mJkgbU5hWBhVcrvx7ZISzv7T+o/AQ02cXBrbzm/GA1nn\nTrnMdTR2c+LVdNtgv2Cxz+JNNJQ59ctG8aANBhq8FM+/43a4A6gIkRM+zjN3+Z4p\n9lyfLqXyldRGUn2IUu/1MTjhO2Ezw94k2yeMsxqZAoGBAIXtBcKZ3X8FNPW1/aRy\nT+YV/BXADl21A5/Pgh5heLx/PGcf3Fm1rO0/KLU6YOqXyHLTietq46CZT/qVtVE6\nDrk592oC4Vj1lExa1XUeCM9tQF5+2LrQgah8AuZu5c6c0wojImKX16PholqORXVD\ntHDm3Jm0ZHie1VLo/TA+wR4n\n-----END PRIVATE KEY-----\n",
+  "client_email": "ylab-366@swift-adviser-413809.iam.gserviceaccount.com",
+  "client_id": "101248170634576703230",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ylab-366%40swift-adviser-413809.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
