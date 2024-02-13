@@ -1,7 +1,8 @@
 # Y_LAB Homework
 
 Проект на FastAPI с использованием PostgreSQL в качестве БД. В проекте реализовано REST API по работе с меню ресторана, все CRUD операции.
-Пункт №5 задания находится в repositoires/google_sheets_repository.py, parsers/google_sheets_parser.py, services/task_service.py, celery_conf.py
+### Пункт №5 задания находится в repositoires/google_sheets_repository.py, parsers/google_sheets_parser.py, services/task_service.py, celery_conf.py
+### Пункт №6 находится в repositoires/discount_repository.py, services/google_sheet_service.py, в repositories/dish_repository.py, converters/menu_converter.py
 ### Зависимости:
 ```
 У меню есть подменю, которые к ней привязаны.
