@@ -45,18 +45,22 @@ class MenuConverter:
                 title=menu.title,
                 description=menu.description,
                 submenus=[],
-                dishes=[]
             )
 
             for submenu in menu.submenus:
-
+                submenu_out = schemas.Submenu(
+                    id=submenu.id,
+                    title=submenu.title,
+                    description=submenu.description,
+                    dishes=[]
+                )
                 for dish in submenu.dishes:
                     dish_data = await GoogleSheetService().get_dish_data_by_title(dish.title)
 
                     if dish_data:
                         dish = await DiscountRepository().set_discount_for_dish(dish, dish_data['discount'])
 
-                    menu_out.dishes.append(dish)
+                    submenu_out.dishes.append(dish)
 
                 menu_out.submenus.append(submenu)
 

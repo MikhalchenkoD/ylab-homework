@@ -40,7 +40,6 @@ async def test_get_menus_list(ac: AsyncClient, buffer_data: dict[str, Any]) -> N
 
     assert response.status_code == 200
     assert len(json_response[0]['submenus']) == 0
-    assert len(json_response[0]['dishes']) == 0
 
 
 async def test_create_submenu(ac: AsyncClient, buffer_data: dict[str, Any]) -> None:
@@ -75,7 +74,7 @@ async def test_get_menus_list_after_create_submenu(ac: AsyncClient, buffer_data:
 
     assert response.status_code == 200
     assert len(json_response[0]['submenus']) == 1
-    assert len(json_response[0]['dishes']) == 0
+    assert len(json_response[0]['submenus'][0]['dishes']) == 0
 
 
 async def test_create_first_dish(ac: AsyncClient, buffer_data: dict[str, Any]) -> None:
@@ -141,7 +140,7 @@ async def test_get_menus_list_after_create_dishes(ac: AsyncClient, buffer_data: 
 
     assert response.status_code == 200
     assert len(json_response[0]['submenus']) == 1
-    assert len(json_response[0]['dishes']) == 2
+    assert len(json_response[0]['submenus'][0]['dishes']) == 2
 
 
 async def test_delete_submenu(ac: AsyncClient, buffer_data: dict[str, Any]) -> None:
@@ -165,7 +164,6 @@ async def test_get_menus_list_after_delete_submenu(ac: AsyncClient, buffer_data:
 
     assert response.status_code == 200
     assert len(json_response[0]['submenus']) == 0
-    assert len(json_response[0]['dishes']) == 0
 
 
 async def test_delete_menu(ac: AsyncClient, buffer_data: dict[str, Any]) -> None:

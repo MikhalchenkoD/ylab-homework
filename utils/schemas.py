@@ -2,6 +2,7 @@ from pydantic import UUID4, BaseModel, ValidationError, field_validator
 
 
 class DishIn(BaseModel):
+    id: UUID4 | None = None
     title: str
     description: str
     price: str
@@ -21,19 +22,23 @@ class DishOut(DishIn):
 
 
 class SubmenuIn(BaseModel):
+    id: UUID4 | None = None
     title: str
     description: str
 
 
 class Submenu(SubmenuIn):
     id: UUID4
+    dishes: list[DishOut]
 
 
-class SubmenuOut(Submenu):
+class SubmenuOut(SubmenuIn):
+    id: UUID4
     dishes_count: int
 
 
 class MenuIn(BaseModel):
+    id: UUID4 | None = None
     title: str
     description: str
 
@@ -48,8 +53,7 @@ class MenuOut(Menu):
 
 
 class MenuOutWithSubmenusAndDishes(Menu):
-    submenus: list[SubmenuOut]
-    dishes: list[DishOut]
+    submenus: list[Submenu]
 
 
 class OutAfterDelete(BaseModel):

@@ -15,7 +15,10 @@ class MenuRepository:
         self.session = session
 
     async def create(self, menu: schemas.MenuIn) -> Row[Any]:
-        menu_obj = Menu(id=uuid.uuid4(), title=menu.title, description=menu.description)
+        if menu.id is None:
+            menu.id = uuid.uuid4()
+
+        menu_obj = Menu(id=menu.id, title=menu.title, description=menu.description)
         self.session.add(menu_obj)
         await self.session.commit()
 

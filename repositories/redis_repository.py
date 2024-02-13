@@ -11,11 +11,11 @@ class RedisRepository:
         self.redis = aioredis.from_url('redis://redis_ylab')
         self.converter = RedisConverter()
 
-    async def save(self, *keys: Any, value: Any) -> None:
+    async def save(self, *keys: Any, value: Any, ex: int = 300) -> None:
         key = await self.converter.generate_key(*keys)
 
         value = pickle.dumps(value)
-        await self.redis.set(key, value, ex=60)
+        await self.redis.set(key, value, ex=ex)
 
     async def get(self, *keys: Any) -> Any | None:
         key = await self.converter.generate_key(*keys)
@@ -38,7 +38,8 @@ class RedisRepository:
             await self.redis.delete(str(key))
 
     async def get_all_parents_and_children_keys(self, key: Any) -> list[str]:
-        keys = ['menus_list', 'submenus_list', 'dishes_list', 'menus_list_with_submenus_and_dishes']
+        keys = ['menus_list', 'submenus_list', 'dishes_list', 'menus_list_with_submenus_and_dishes',
+                'data_from_google_sheet', 'dishes_data_from_google_sheet']
         matching_keys = []
         cursor = b'0'
 

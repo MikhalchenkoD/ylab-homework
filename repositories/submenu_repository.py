@@ -14,8 +14,11 @@ class SubmenuRepository:
         self.session = session
 
     async def create(self, submenu: schemas.SubmenuIn, menu_id: uuid.UUID) -> Row[Any]:
+        if submenu.id is None:
+            submenu.id = uuid.uuid4()
+
         submenu_obj = Submenu(
-            id=uuid.uuid4(),
+            id=submenu.id,
             title=submenu.title,
             description=submenu.description,
             menu_id=menu_id,

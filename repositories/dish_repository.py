@@ -14,8 +14,10 @@ class DishRepository:
         self.session = session
 
     async def create(self, dish: schemas.DishIn, submenu_id: uuid.UUID) -> Dish:
+        if dish.id is None:
+            dish.id = uuid.uuid4()
         dish_obj = Dish(
-            id=uuid.uuid4(),
+            id=dish.id,
             title=dish.title,
             description=dish.description,
             price=dish.price,
