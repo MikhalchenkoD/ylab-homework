@@ -19,13 +19,11 @@ class TaskService:
         self.dish_repository = DishRepository(session)
         self.redis = RedisRepository()
 
-    async def check_data(self):
+    async def check_data(self) -> None:
         data = await self.google_sheets_repository.get_data()
         parsed_data = await self.parser.parse_data(data)
         for menu_item in parsed_data:
             menu = await self.menu_repository.get_by_title(menu_item['title'])
-            menu_id = None
-            submenu_id = None
 
             if not menu:
                 menu_data = schemas.MenuIn(title=menu_item['title'], description=menu_item['description'])
@@ -40,8 +38,8 @@ class TaskService:
                 updated_menu = await self.menu_repository.update(menu.id, menu_data)
 
                 await self.redis.delete_parents_and_children_keys(menu_id)
-
-                menu_id = updated_menu[0].id
+                if updated_menu:
+                    menu_id = updated_menu[0].id
 
             for submenu_item in menu_item['submenus']:
                 submenu = await self.submenu_repository.get_by_title(submenu_item['title'])
@@ -62,7 +60,8 @@ class TaskService:
 
                     await self.redis.delete_parents_and_children_keys(menu_id)
 
-                    submenu_id = updated_menu[0].id
+                    if updated_menu:
+                        submenu_id = updated_menu[0].id
 
                 for dish_item in submenu_item['dishes']:
                     dish = await self.dish_repository.get_by_title(dish_item['title'])
@@ -81,3 +80,11 @@ class TaskService:
                         await self.dish_repository.update(dish.id, dish_data)
 
                         await self.redis.delete_parents_and_children_keys(menu_id)
+
+    async def get_dish_data_by_title(self, title: str):
+        data = await self.google_sheets_repository.get_data()
+        dishes = await self.parser.parse_dish_data(data)
+
+        for dish in dishes:
+            if dish['title'] == title:
+                return dish

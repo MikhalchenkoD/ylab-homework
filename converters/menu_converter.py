@@ -2,6 +2,7 @@ from typing import Any, Sequence
 
 from sqlalchemy import Row
 
+from services.google_sheet_service import GoogleSheetService
 from utils import schemas
 
 
@@ -49,6 +50,13 @@ class MenuConverter:
             for submenu in menu.submenus:
 
                 for dish in submenu.dishes:
+                    dish_data = await GoogleSheetService().get_dish_data_by_title(dish.title)
+
+                    if dish_data:
+                        price = float(dish.price)
+                        discount = (price * dish_data['discount']) / 100
+                        dish.price = str(round(price - discount, 2))
+
                     menu_out.dishes.append(dish)
 
                 menu_out.submenus.append(submenu)
