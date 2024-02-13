@@ -2,6 +2,7 @@ from typing import Any, Sequence
 
 from sqlalchemy import Row
 
+from repositories.discount_repository import DiscountRepository
 from services.google_sheet_service import GoogleSheetService
 from utils import schemas
 
@@ -53,9 +54,7 @@ class MenuConverter:
                     dish_data = await GoogleSheetService().get_dish_data_by_title(dish.title)
 
                     if dish_data:
-                        price = float(dish.price)
-                        discount = (price * dish_data['discount']) / 100
-                        dish.price = str(round(price - discount, 2))
+                        dish = await DiscountRepository().set_discount_for_dish(dish, dish_data['discount'])
 
                     menu_out.dishes.append(dish)
 

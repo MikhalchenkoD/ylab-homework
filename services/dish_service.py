@@ -5,6 +5,7 @@ from fastapi import BackgroundTasks, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import Dish
+from repositories.discount_repository import DiscountRepository
 from repositories.dish_repository import DishRepository
 from repositories.redis_repository import RedisRepository
 from services.google_sheet_service import GoogleSheetService
@@ -17,6 +18,7 @@ class DishService:
         self.repository = DishRepository(self.session)
         self.redis = RedisRepository()
         self.google_sheet_service = GoogleSheetService()
+        self.discount_repository = DiscountRepository()
 
     async def create(self, background_tasks: BackgroundTasks, dish: schemas.DishIn, menu_id: uuid.UUID,
                      submenu_id: uuid.UUID) -> Dish:
@@ -33,18 +35,19 @@ class DishService:
             return dishes_in_cache
 
         dishes = await self.repository.get(submenu_id)
+        updated_dishes_list = []
 
         for dish in dishes:
             dish_data = await self.google_sheet_service.get_dish_data_by_title(dish.title)
 
             if dish_data:
-                price = float(dish.price)
-                discount = (price * dish_data['discount']) / 100
-                dish.price = str(price - discount)
+                dish = await self.discount_repository.set_discount_for_dish(dish, dish_data['discount'])
 
-        await self.redis.save('dishes_list', value=dishes)
+            updated_dishes_list.append(dish)
 
-        return dishes
+        await self.redis.save('dishes_list', value=updated_dishes_list)
+
+        return updated_dishes_list
 
     async def get_by_id(self, menu_id: uuid.UUID, submenu_id: uuid.UUID, dish_id: uuid.UUID) -> Dish:
         dish_in_cache = await self.redis.get(menu_id, submenu_id, dish_id)
@@ -60,9 +63,7 @@ class DishService:
         dish_data = await self.google_sheet_service.get_dish_data_by_title(dish.title)
 
         if dish_data:
-            price = float(dish.price)
-            discount = (price * dish_data['discount']) / 100
-            dish.price = str(price - discount)
+            dish = await self.discount_repository.set_discount_for_dish(dish, dish_data['discount'])
 
         await self.redis.save(menu_id, submenu_id, dish_id, value=dish)
 
@@ -80,9 +81,7 @@ class DishService:
         dish_data = await self.google_sheet_service.get_dish_data_by_title(updated_dish.title)
 
         if dish_data:
-            price = float(updated_dish.price)
-            discount = (price * dish_data['discount']) / 100
-            updated_dish.price = str(price - discount)
+            updated_dish = await self.discount_repository.set_discount_for_dish(updated_dish, dish_data['discount'])
 
         return updated_dish
 
